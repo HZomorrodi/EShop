@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EShop.Entities
+namespace EShop.Common.Constants
 {
-    public class BaseEntity
+    public class LogCodes
     {
-        public int Id { get; set; }
+        public const int RegisterCode = 1;
     }
 }

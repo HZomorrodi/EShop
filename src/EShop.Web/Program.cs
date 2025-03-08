@@ -1,12 +1,14 @@
 using EShop.Entities;
 using EShop.IocConfig;
 using EShop.ViewModels.App;
+using EShop.ViewModels.Application;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(nameof(ConnectionStrings)));
+builder.Services.Configure<EmailConfigsModel>(builder.Configuration.GetSection("EmailConfigs"));
 builder.Services.AddCustomServices();
  
 builder.Services.AddControllersWithViews();

@@ -31,6 +31,7 @@ namespace EShop.ViewModels.Account
         public string Password { get; set; }
         [Display(Name = "تکرار رمز عبور")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
+        [DataType(DataType.Password)]
         [Compare(nameof(Password), ErrorMessage = AttributesErrorMessages.CompareErrorMessage)]
         public string ConfirmPassword { get; set; }
 

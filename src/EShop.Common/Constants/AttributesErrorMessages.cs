@@ -14,6 +14,6 @@ namespace EShop.Common.Constants
         public const string StringLengthErrorMessage = "{0}  باید بین {2} کارکتر و {1} کارکتر باشد ";
         public const string RegularExpressionErrorMessage = " {0} را به درستی وارد کنید ";
         public const string RemoteErrorMessage = "  این {0} قبلا درسیستم ثبت شده است";
-        public const string CompareErrorMessage = "{0} با تکرار آن تطابق ندارد";
+        public const string CompareErrorMessage = "{1} با تکرار آن تطابق ندارد";
     }
 }

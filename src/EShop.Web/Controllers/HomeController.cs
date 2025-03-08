@@ -1,5 +1,4 @@
-﻿using AspNetCoreGeneratedDocument;
-using EShop.DataLayer.Context;
+﻿using EShop.DataLayer.Context;
 using EShop.Entities;
 using EShop.Services.Contracts;
 using EShop.Services.EFServices;
@@ -33,6 +32,7 @@ namespace EShop.Web.Controllers
             //await _uow.SaveChangesAsync();
             return View();
         }
+       
         public IActionResult AddProduct()
         {
             return View();

@@ -1,0 +1,23 @@
+﻿@using EShop.ViewModels.Account
+@model RegisterViewModel;
+<form method="post">
+	<div class="mb-3">
+		<label asp-for="UserName" class="form-label"></label>
+		<input asp-for="UserName" class="form-control" type="text" id="UserName232" placeholder="نام خود را وارد کنید">
+		<span asp-validation-for="UserName" class="text-danger"></span>
+	</div>
+	<div class="mb-3">
+		<label for="new-email" class="form-label">ایمیل</label>
+		<input type="email" class="form-control" id="new-email" placeholder="ایمیل خود را وارد کنید">
+	</div>
+	<div class="mb-3">
+		<label for="new-password" class="form-label">رمز عبور</label>
+		<input type="password" class="form-control" id="new-password" placeholder="رمز عبور خود را وارد کنید">
+	</div>
+	<div class="mb-3">
+		<label for="confirm-password" class="form-label">تأیید رمز عبور</label>
+		<input type="password" class="form-control" id="confirm-password" placeholder="رمز عبور خود را تأیید کنید">
+	</div>
+	<button type="submit" class="btn btn-primary">ثبت نام</button>
+</form>
+
