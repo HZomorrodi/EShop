@@ -64,7 +64,7 @@ namespace EShop.Services.EFServices
 
         public List<TEntity> GetAll()
         {
-            return _entity.ToList();
+            return [.. _entity];
         }
     }
 }

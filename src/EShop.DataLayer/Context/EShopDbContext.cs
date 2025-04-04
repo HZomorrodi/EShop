@@ -1,4 +1,5 @@
 ﻿using EShop.Entities;
+using EShop.Entities.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,18 +11,16 @@ using System.Threading.Tasks;
 
 namespace EShop.DataLayer.Context
 {
-    public class EShopDbContext : IdentityDbContext<User, Role, int>, IUnitOfWork
+    public class EShopDbContext(DbContextOptions options) : IdentityDbContext<User, Role, int, UserClaim, UserRole, UserLogin, RoleClaim, UserToken>(options),
+        IUnitOfWork
     {
-
-        public EShopDbContext(DbContextOptions options) : base(options)
-        {
-
-        }
         public DbSet<Product> Products { get; set; }
-
-        public Task<int> SaveChangesAsync()
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            return base.SaveChangesAsync();
+            base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(typeof(EShopDbContext).Assembly);
         }
     }
+    
+
 }

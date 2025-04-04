@@ -10,18 +10,12 @@ using MimeKit.Text;
 
 namespace EShop.Services
 {
-    public class EmailSenderService : IEmailSenderService
+    public class EmailSenderService(
+        IOptionsSnapshot<EmailConfigsModel> emailConfig,
+        IWebHostEnvironment env) : IEmailSenderService  
     {
-        private readonly IOptionsSnapshot<EmailConfigsModel> _emailConfig;
-        private readonly IWebHostEnvironment _env;
-
-        public EmailSenderService(
-            IOptionsSnapshot<EmailConfigsModel> emailConfig,
-            IWebHostEnvironment env)
-        {
-            _emailConfig = emailConfig;
-            _env = env;
-        }
+        private readonly IOptionsSnapshot<EmailConfigsModel> _emailConfig = emailConfig;
+        private readonly IWebHostEnvironment _env = env;
 
         public async Task SendEmailAsync(string to, string subject, string body)
         {
@@ -35,7 +29,7 @@ namespace EShop.Services
             };
             if (_env.IsDevelopment())
             {
-                await using var stream = new FileStream($@"C:\Users\268\Desktop\New folder\Email\Email-{Guid.NewGuid():N}.eml", FileMode.CreateNew);
+                await using var stream = new FileStream($@"C:\Users\Lenovo\Desktop\New folder\Email\Email-{Guid.NewGuid():N}.eml", FileMode.CreateNew);
                 await mimeMessage.WriteToAsync(stream);
             }
             else

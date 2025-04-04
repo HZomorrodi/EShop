@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EShop.Entities
+namespace EShop.Entities.Identity
 {
-    public class User : IdentityUser<int>
+    public class RoleClaim : IdentityRoleClaim<int>
     {
-        public DateTime CreatedDateTime { get; set; }
+        public virtual Role Role { get; set; }
     }
 }

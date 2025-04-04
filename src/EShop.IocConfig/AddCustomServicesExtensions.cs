@@ -1,5 +1,4 @@
 ﻿using EShop.DataLayer.Context;
-using EShop.Entities;
 using EShop.Services.Contracts;
 using EShop.Services.EFServices;
 using EShop.ViewModels.App;
@@ -16,6 +15,10 @@ using EShop.Common.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using EShop.Services;
+using EShop.Entities.Identity;
+using EShop.Services.EFServices.Identity;
+using EShop.Services.Contracts.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace EShop.IocConfig
 {
     public static class AddCustomServicesExtensions
@@ -25,10 +28,38 @@ namespace EShop.IocConfig
             ServiceProvider serviceProvider = services.BuildServiceProvider();
             ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
             services.AddDbContext<EShopDbContext>(options => options.UseSqlServer(connectionStrings.EShopDbContextConnection));
+
+            #region RegisterIdentityServices
+
+            services.AddScoped<IRoleManagerService, RoleManagerService>();
+            services.AddScoped<RoleManager<Role>, RoleManagerService>();
+            
+            services.AddScoped<IRoleStoreService, RoleStoreService>();
+            services.AddScoped<RoleStore<Role, EShopDbContext, int, UserRole, RoleClaim>, RoleStoreService>();
+            
+            services.AddScoped<ISignInManagerService, SignInManagerService>();
+            services.AddScoped<SignInManager<User>, SignInManagerService>();
+            
+            services.AddScoped<IUserManagerService, UserManagerService>();
+            services.AddScoped<UserManager<User>, UserManagerService>();
+
+            services.AddScoped<IUserStoreService, UserStoreService>();
+            services.AddScoped<UserStore<User, Role, EShopDbContext, int,
+                UserClaim, UserRole, UserLogin,
+                UserToken, RoleClaim>, UserStoreService>();
+
+            #endregion
             services.AddScoped<IUnitOfWork, EShopDbContext>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
-            services.AddIdentity<User, Role>().AddEntityFrameworkStores<EShopDbContext>().AddDefaultTokenProviders();
+            services.AddIdentity<User, Role>().
+                //AddEntityFrameworkStores<EShopDbContext>().
+                AddUserStore<UserStoreService>().
+                AddRoleStore<RoleStoreService>().
+                AddUserManager<UserManagerService>().
+                AddRoleManager<RoleManagerService>().
+                AddSignInManager<SignInManagerService>().
+                AddDefaultTokenProviders();
             services.AddRazorViewRenderer();
             return services;
         }

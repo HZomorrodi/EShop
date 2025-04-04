@@ -1,7 +1,8 @@
 ﻿using EShop.Common.Constants;
 using EShop.Common.Mvc;
-using EShop.Entities;
+using EShop.Entities.Identity;
 using EShop.Services.Contracts;
+using EShop.Services.Contracts.Identity;
 using EShop.ViewModels.Account;
 using Humanizer;
 using Microsoft.AspNetCore.Identity;
@@ -9,23 +10,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EShop.Web.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController(ILogger<AccountController> logger,
+        IUserManagerService userManager,
+        IViewRendererService viewRendererService,
+        IEmailSenderService emailSenderService) : Controller
     {
-        public AccountController(ILogger<AccountController> logger,
-            UserManager<User> userManager,
-            IViewRendererService viewRendererService,
-            IEmailSenderService emailSenderService)
-        {
-            Logger = logger;
-            UserManager = userManager;
-            ViewRendererService = viewRendererService;
-            EmailSenderService = emailSenderService;
-        }
-
-        public ILogger<AccountController> Logger { get; }
-        public UserManager<User> UserManager { get; }
-        public IViewRendererService ViewRendererService { get; }
-        public IEmailSenderService EmailSenderService { get; }
+        public ILogger<AccountController> Logger { get; } = logger;
+        public IUserManagerService UserManager { get; } = userManager;
+        public IViewRendererService RendererService { get; } = viewRendererService;
+        public IEmailSenderService EmailSenderService { get; } = emailSenderService;
 
         [HttpPost]
         public IActionResult CheckUserAccount(string UserName)
@@ -36,40 +29,38 @@ namespace EShop.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            List<string> errors = new List<string>();
-            if (ModelState.IsValid)
+            List<string> errors = [];
+            if (!ModelState.IsValid) return BadRequest(errors);
+            User user = new()
             {
-                var user = new User
-                {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    CreatedDateTime = DateTime.Now
-                };
-                IdentityResult result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    Logger.LogInformation(LogCodes.RegisterCode, $"{user.UserName} creates a new account");
-                    var activationCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-                    //send Email
-                    string body = await ViewRendererService.RenderViewToStringAsync(
-                     "~/Views/EmailTemplates/_ActivationUserEmailTemplate.cshtml",
-                     new RegisterEmailConfirmationViewModel()
-                     {
-                         ActivationCode = activationCode,
-                         UserName = model.UserName,
-                         CreatedDateTime = user.CreatedDateTime.ToString()
-                     });
+                UserName = model.UserName,
+                Email = model.Email,
+                CreatedDateTime = DateTime.Now
+            };
+            IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                Logger.LogInformation(LogCodes.RegisterCode, $"{user.UserName} creates a new account");
+                string activationCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+                //send Email
+                string body = await RendererService.RenderViewToStringAsync(
+                    "~/Views/EmailTemplates/_ActivationUserEmailTemplate.cshtml",
+                    new RegisterEmailConfirmationViewModel()
+                    {
+                        ActivationCode = activationCode,
+                        UserName = model.UserName,
+                        CreatedDateTime = user.CreatedDateTime.ToString()
+                    });
 
-                    await EmailSenderService.SendEmailAsync(model.Email,
-                         "فعال‌سازی حساب کاربری", body);
+                await EmailSenderService.SendEmailAsync(model.Email,
+                    "فعال‌سازی حساب کاربری", body);
 
 
-                    return Json("Success");
-                }
-                foreach (IdentityError error in result.Errors)
-                {
-                    errors.Add(error.Description);
-                }
+                return Json("Success");
+            }
+            foreach (IdentityError error in result.Errors)
+            {
+                errors.Add(error.Description);
             }
             return BadRequest(errors);
         }

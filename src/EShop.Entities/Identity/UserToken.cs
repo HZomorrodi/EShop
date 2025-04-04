@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EShop.Entities
+namespace EShop.Entities.Identity
 {
-    public class Role : IdentityRole<int>
+    public class UserToken : IdentityUserToken<int>
     {
+        public virtual User User { get; set; }
     }
 }

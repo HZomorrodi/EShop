@@ -12,7 +12,7 @@ namespace EShop.DataLayer.Context
     {
         DbSet<TEntity> Set<TEntity>() where TEntity : class;
         int SaveChanges();
-        Task<int> SaveChangesAsync();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     }
 }
