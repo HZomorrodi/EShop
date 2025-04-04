@@ -1,13 +1,6 @@
 ﻿@using EShop.ViewModels.Account
 @model RegisterViewModel;
-<form asp-action="Register" asp-controller="Account" id="registerForm"
-	  data-ajax="true"
-	  data-ajax-method="POST"
-	  data-ajax-loading="#spinner"
-	  data-ajax-begin="onBegin"
-	  data-ajax-complete="onComplete"
-	  data-ajax-success="onsuccess"
-	  data-ajax-failure="onfailure">
+<form   id="registerForm">
 	<div asp-validation-summary="All" class="text-danger" id="validationErrors"></div>
 	<div class="my-3">
 		<label asp-for="UserName" class="form-label"></label>
@@ -46,3 +39,77 @@
 	</p>
 </form>
  
+<script src="/lib/jquery/dist/jquery.min.js"></script>
+
+<script>
+	 $(document).ready(function() {
+		$('#registerForm').submit(function(e) {
+
+			console.log("hel")
+			// Show loading spinner
+			$('#spinner').show();
+
+			$.ajax({
+				url:"/Account/Register",
+				method: "POST",
+				data: $(this).serialize(),
+				success: function(response) {
+					if (response.success) {
+						$('.alert-success').removeClass('d-none');
+					} else {
+						$('#validationErrors').html(response.errors);
+					}
+				},
+				error: function(xhr) {
+					$('#validationErrors').html(xhr.responseText);
+				},
+				complete: function() {
+					$('#spinner').hide();
+				}
+			});
+		});
+	});
+</script>
+<script>
+		$(document).ready(function() {
+		$('#registerBtn').click(function() {
+			// 1. Collect all form data manually
+			var formData = {
+				UserName: $('#userName').val(),
+				Email: $('#email').val(),
+				Password: $('#password').val(),
+				ConfirmPassword: $('#confirmPassword').val()
+			};
+
+			// 2. Client-side validation
+			if (!formData.UserName || !formData.Email || !formData.Password) {
+				$('#validationErrors').text("Please fill all required fields");
+				return;
+			}
+
+			// 3. Send as JSON
+			$.ajax({
+				url: '/Account/Register',
+				type: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify(formData),
+				success: function(response) {
+					if (response.success) {
+						$('.alert-success').removeClass('d-none');
+					}
+				},
+				error: function(xhr) {
+					// Handle server validation errors
+					if (xhr.status === 400) {
+						const errors = xhr.responseJSON;
+						let errorHtml = '';
+						for (let key in errors) {
+							errorHtml += `<li>${errors[key]}</li>`;
+						}
+						$('#validationErrors').html(`<ul>${errorHtml}</ul>`);
+					}
+				}
+			});
+		});
+	});
+</script>
