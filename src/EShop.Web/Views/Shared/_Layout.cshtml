@@ -120,7 +120,7 @@
 			<div class="row">
 				<div class="col-6 mb-3">
 					<div class="card">
-						<img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+						<img src="https://picsum.photos/150" class="card-img-top" alt="...">
 						<div class="card-body">
 							<h5 class="card-title">گوشی موبایل سامسونگ s1</h5>
 							<div class="d-flex justify-content-center align-items-center">
@@ -140,7 +140,7 @@
 				</div>
 				<div class="col-6 mb-3">
 					<div class="card">
-						<img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+						<img src="https://picsum.photos/150" class="card-img-top" alt="...">
 						<div class="card-body">
 							<h5 class="card-title">گوشی موبایل سامسونگ s1</h5>
 							<div class="d-flex justify-content-center align-items-center">
@@ -162,7 +162,7 @@
 			<div class="row">
 				<div class="col-6 mb-3">
 					<div class="card">
-						<img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+						<img src="https://picsum.photos/150" class="card-img-top" alt="...">
 						<div class="card-body">
 							<h5 class="card-title">گوشی موبایل سامسونگ s1</h5>
 							<div class="d-flex justify-content-center align-items-center">
@@ -182,7 +182,7 @@
 				</div>
 				<div class="col-6 mb-3">
 					<div class="card">
-						<img src="https://via.placeholder.com/150" class="card-img-top" alt="...">
+						<img src="https://picsum.photos/150" class="card-img-top" alt="...">
 						<div class="card-body">
 							<h5 class="card-title">گوشی موبایل سامسونگ s1</h5>
 							<div class="d-flex justify-content-center align-items-center">
@@ -225,6 +225,79 @@
  
 	<partial name="_ValidationScriptsPartial" />
 
+	<script>
+		 $(document).ready(function() {
+			$('#registerForm').submit(function(e) {
+				e.preventDefault()
+				console.log("hel")
+				// Show loading spinner
+				$('#spinner').show();
+
+				$.ajax({
+					url:"/Account/Register",
+					method: "POST",
+					data: $(this).serialize(),
+					success: function(response) {
+						if (response=="Success") {
+							$('.alert-success').removeClass('d-none');
+						//	 $('#loginModal').modal('hide');
+						} else {
+							$('#validationErrors').html(response.errors);
+						}
+					},
+					error: function(xhr) {
+						$('#validationErrors').html(xhr.responseText);
+					},
+					complete: function() {
+						$('#spinner').hide();
+					}
+				});
+			});
+		});
+	</script>
+	@* <script>
+			$(document).ready(function() {
+			$('#registerBtn').click(function() {
+				// 1. Collect all form data manually
+				var formData = {
+					UserName: $('#userName').val(),
+					Email: $('#email').val(),
+					Password: $('#password').val(),
+					ConfirmPassword: $('#confirmPassword').val()
+				};
+
+				// 2. Client-side validation
+				if (!formData.UserName || !formData.Email || !formData.Password) {
+					$('#validationErrors').text("Please fill all required fields");
+					return;
+				}
+
+				// 3. Send as JSON
+				$.ajax({
+					url: '/Account/Register',
+					type: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify(formData),
+					success: function(response) {
+						if (response.success) {
+							$('.alert-success').removeClass('d-none');
+						}
+					},
+					error: function(xhr) {
+						// Handle server validation errors
+						if (xhr.status === 400) {
+							const errors = xhr.responseJSON;
+							let errorHtml = '';
+							for (let key in errors) {
+								errorHtml += `<li>${errors[key]}</li>`;
+							}
+							$('#validationErrors').html(`<ul>${errorHtml}</ul>`);
+						}
+					}
+				});
+			});
+		});
+	</script> *@
 	@await RenderSectionAsync("Scripts", required: false)
 
 </body>

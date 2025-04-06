@@ -29,7 +29,7 @@ namespace EShop.Services
             };
             if (_env.IsDevelopment())
             {
-                await using var stream = new FileStream($@"C:\Users\Lenovo\Desktop\New folder\Email\Email-{Guid.NewGuid():N}.eml", FileMode.CreateNew);
+                await using var stream = new FileStream($@"C:\Users\268\Desktop\New folder\Email\Email-{Guid.NewGuid():N}.eml", FileMode.CreateNew);
                 await mimeMessage.WriteToAsync(stream);
             }
             else

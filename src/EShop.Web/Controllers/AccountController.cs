@@ -27,10 +27,11 @@ namespace EShop.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> Register([FromForm] RegisterViewModel model)
         {
             List<string> errors = [];
-            if (!ModelState.IsValid) return BadRequest(errors);
+            if (!ModelState.IsValid) 
+                return BadRequest(errors);
             User user = new()
             {
                 UserName = model.UserName,
