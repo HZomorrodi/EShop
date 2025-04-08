@@ -1,15 +1,22 @@
 ﻿@using EShop.ViewModels.Account
 @model RegisterViewModel;
-<form   id="registerForm" method="post">
+<form asp-action="Register" asp-controller="Account" id="registerForm"
+	  data-ajax="true"
+	  data-ajax-method="POST"
+	  data-ajax-loading="#spinner"
+	  data-ajax-begin="onBegin"
+	  data-ajax-complete="onComplete"
+	  data-ajax-success="onsuccess"
+	  data-ajax-failure="onfailure">
 	<div asp-validation-summary="All" class="text-danger" id="validationErrors"></div>
 	<div class="my-3">
 		<label asp-for="UserName" class="form-label"></label>
-		<input asp-for="UserName" class="form-control" id="userNameRegister">
+		<input asp-for="UserName" class="form-control">
 		<span asp-validation-for="UserName" class="text-danger"></span>
 	</div>
 	<div class="mb-3">
 		<label asp-for="Email" class="form-label"></label>
-		<input asp-for="Email" class="form-control" id="emailRegister">
+		<input asp-for="Email" class="form-control">
 		<span asp-validation-for="Email" class="text-danger"></span>
 		<div id="emailHelp" class="form-text">
 			ما به شما اطمینان میدهیم که ایمیل شما را با کسی به اشتراک نخواهیم گذاشت
@@ -17,12 +24,12 @@
 	</div>
 	<div class="mb-3">
 		<label asp-for="Password" class="form-label"></label>
-		<input asp-for="Password" class="form-control" id="passwordRegister">
+		<input asp-for="Password" class="form-control">
 		<span asp-validation-for="Password" class="text-danger"></span>
 	</div>
 	<div class="mb-3">
 		<label asp-for="ConfirmPassword" class="form-label"></label>
-		<input asp-for="ConfirmPassword" class="form-control" id="confirmPasswordRegister">
+		<input asp-for="ConfirmPassword" class="form-control">
 		<span asp-validation-for="ConfirmPassword" class="text-danger"></span>
 	</div>
 
