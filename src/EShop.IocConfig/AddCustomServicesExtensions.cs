@@ -26,7 +26,7 @@ namespace EShop.IocConfig
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
             ServiceProvider serviceProvider = services.BuildServiceProvider();
-            ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
+            ConnectionStringsViewModel connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStringsViewModel>>().CurrentValue;
             services.AddDbContext<EShopDbContext>(options => options.UseSqlServer(connectionStrings.EShopDbContextConnection));
 
             #region RegisterIdentityServices

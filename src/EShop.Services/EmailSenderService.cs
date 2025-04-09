@@ -11,10 +11,10 @@ using MimeKit.Text;
 namespace EShop.Services
 {
     public class EmailSenderService(
-        IOptionsSnapshot<EmailConfigsModel> emailConfig,
+        IOptionsSnapshot<EmailConfigsViewModel> emailConfig,
         IWebHostEnvironment env) : IEmailSenderService  
     {
-        private readonly IOptionsSnapshot<EmailConfigsModel> _emailConfig = emailConfig;
+        private readonly IOptionsSnapshot<EmailConfigsViewModel> _emailConfig = emailConfig;
         private readonly IWebHostEnvironment _env = env;
 
         public async Task SendEmailAsync(string to, string subject, string body)

@@ -21,7 +21,9 @@ namespace EShop.ViewModels.Account
 
         [Display(Name = "ایمیل")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
-        [EmailAddress(ErrorMessage = AttributesErrorMessages.RegularExpressionErrorMessage)]
+        [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
+    ErrorMessage = AttributesErrorMessages.RegularExpressionErrorMessage)]
+        [MaxLength(100, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
         public string Email { get; set; }
         [Display(Name = "رمز عبور")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]

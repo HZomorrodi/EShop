@@ -7,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.Configure<ConnectionStrings>(builder.Configuration.GetSection(nameof(ConnectionStrings)));
-builder.Services.Configure<EmailConfigsModel>(builder.Configuration.GetSection("EmailConfigs"));
+builder.Services.Configure<ConnectionStringsViewModel>(builder.Configuration.GetSection("ConnectionStrings"));
+builder.Services.Configure<EmailConfigsViewModel>(builder.Configuration.GetSection("EmailConfigs"));
 builder.Services.AddCustomServices();
  
 builder.Services.AddControllersWithViews();

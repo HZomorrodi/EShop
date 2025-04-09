@@ -30,7 +30,11 @@ namespace EShop.Web.Controllers
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             List<string> errors = [];
-            if (!ModelState.IsValid) return BadRequest(errors);
+            if (!ModelState.IsValid)
+            {
+                errors.Add(PublicConstantStrings.ModelStateErrorMessage);
+                return BadRequest(errors);
+            }
             User user = new()
             {
                 UserName = model.UserName,
