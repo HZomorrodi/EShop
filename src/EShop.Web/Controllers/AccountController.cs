@@ -69,9 +69,9 @@ namespace EShop.Web.Controllers
             return BadRequest(errors);
         }
 
-        public IActionResult ConfirmationAccount(string code, string UserName)
+        public IActionResult ConfirmationAccount(string code, string userName)
         {
-            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(UserName))
+            if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(userName))
             {
                 return View("Error2");
             }
