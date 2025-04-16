@@ -4,6 +4,7 @@ using EShop.Services.Contracts;
 using EShop.Services.EFServices;
 using EShop.ViewModels.Products;
 using EShop.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -60,7 +61,11 @@ namespace EShop.Web.Controllers
             await _uow.SaveChangesAsync();
             return View("RemoveAsync");
         }
-         
+        [Authorize] 
+        public IActionResult Test()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

@@ -1,7 +1,13 @@
-﻿
+﻿@using System.Net
+
 @{
-    ViewData["Title"] = "Error2";
+	ViewData["Title"] = "خطای 500";
+	Context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 }
 
-<h1>Error2</h1>
+<div class="alert alert-danger text-center" role="alert">
+	خطای نرم‌افزاری
+	<br />
+	لطفا مجددا تلاش نمائید.
+</div>
 

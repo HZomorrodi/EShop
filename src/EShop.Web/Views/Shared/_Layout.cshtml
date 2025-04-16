@@ -73,21 +73,8 @@
 					<div class="tab-content" id="myTabContent">
 						<div class="tab-pane fade show active" id="login-tab-pane" role="tabpanel" aria-labelledby="login-tab" tabindex="0">
 							<!-- Login Form -->
-							<form>
-								<div class="mb-3">
-									<label for="email" class="form-label">ایمیل</label>
-									<input type="email" dir="rtl" class="form-control" id="email" placeholder="ایمیل خود را وارد کنید">
-								</div>
-								<div class="mb-3">
-									<label for="password" class="form-label">رمز عبور</label>
-									<input type="password" class="form-control" id="password" placeholder="رمز عبور خود را وارد کنید">
-								</div>
-								<div class=" mb-3">
-									<input type="checkbox" id="Remember" class="form-check-input" />
-									<label for="Remember" class="form-check-label">مرا به خاطر بسپار</label>
-								</div>
-								<button type="submit" class="btn btn-primary">ورود</button>
-							</form>
+							<partial name="_LoginPartial" model="new LoginViewModel()" />
+
 						</div>
 						<div class="tab-pane fade" id="signup-tab-pane" role="tabpanel" aria-labelledby="signup-tab" tabindex="0">
 							<!-- Signup Form -->

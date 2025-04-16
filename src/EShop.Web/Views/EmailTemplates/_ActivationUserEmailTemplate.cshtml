@@ -2,7 +2,7 @@
 @{
     Layout = "~/Views/EmailTemplates/_EmailsLayout.cshtml";
     ViewData["Title"] = "فعال سازی حساب کاربری";
-    var activationUserLink = Url.Action("ConfirmationAccount", "Account", new { area = "", code = Model.ActivationCode, UserName = Model.UserName }, protocol: this.Context.Request.Scheme);
+    var activationUserLink = Url.Action("ConfirmationAccount", "Account", new { area = "", code = Model.ActivationCode, userName = Model.UserName }, protocol: this.Context.Request.Scheme);
 }
 <h3>
     @Model.UserName عزیز

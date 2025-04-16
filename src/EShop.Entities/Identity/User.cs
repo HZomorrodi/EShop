@@ -17,9 +17,9 @@ namespace EShop.Entities.Identity
         public virtual ICollection<UserToken> UserToken { get; set; }
         public DateTime CreatedDateTime { get; set; }
         [MaxLength(50)]
-        public string FirstName { get; set; }
+        public string? FirstName { get; set; }
         [MaxLength(50)]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
         [NotMapped]
         public string FullName { get { return $"{FirstName} {LastName}"; } }
     }

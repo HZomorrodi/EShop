@@ -33,13 +33,13 @@ namespace EShop.IocConfig
 
             services.AddScoped<IRoleManagerService, RoleManagerService>();
             services.AddScoped<RoleManager<Role>, RoleManagerService>();
-            
+
             services.AddScoped<IRoleStoreService, RoleStoreService>();
             services.AddScoped<RoleStore<Role, EShopDbContext, int, UserRole, RoleClaim>, RoleStoreService>();
-            
+
             services.AddScoped<ISignInManagerService, SignInManagerService>();
             services.AddScoped<SignInManager<User>, SignInManagerService>();
-            
+
             services.AddScoped<IUserManagerService, UserManagerService>();
             services.AddScoped<UserManager<User>, UserManagerService>();
 
@@ -49,10 +49,12 @@ namespace EShop.IocConfig
                 UserToken, RoleClaim>, UserStoreService>();
 
             #endregion
+
             services.AddScoped<IUnitOfWork, EShopDbContext>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
-            services.AddIdentity<User, Role>().
+
+            services.AddIdentity<User, Role>(setupAction).
                 //AddEntityFrameworkStores<EShopDbContext>().
                 AddUserStore<UserStoreService>().
                 AddRoleStore<RoleStoreService>().
@@ -64,6 +66,23 @@ namespace EShop.IocConfig
             return services;
         }
 
+        private static Action<IdentityOptions> setupAction = identityOptions =>
+           {
+               identityOptions.Password.RequireDigit = false;
+               identityOptions.Password.RequireLowercase = false;
+               identityOptions.Password.RequireUppercase = false;
+               identityOptions.Password.RequireNonAlphanumeric = false;
+
+               identityOptions.Lockout.AllowedForNewUsers = false;
+               identityOptions.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+               identityOptions.Lockout.MaxFailedAccessAttempts = 3;
+
+               identityOptions.SignIn.RequireConfirmedAccount = true;
+               identityOptions.SignIn.RequireConfirmedEmail = true;
+               identityOptions.SignIn.RequireConfirmedPhoneNumber = false;
+
+               identityOptions.User.RequireUniqueEmail = true;
+           };
         public static IServiceCollection AddRazorViewRenderer(this IServiceCollection services)
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

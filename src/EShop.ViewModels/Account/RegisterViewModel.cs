@@ -13,10 +13,12 @@ namespace EShop.ViewModels.Account
     {
         [Display(Name = "نام کاربری")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
-        [MinLength(4, ErrorMessage = AttributesErrorMessages.MinErrorMessage)]
-        [MaxLength(40, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
+        [MinLength(3, ErrorMessage = AttributesErrorMessages.MinErrorMessage)]
+        [MaxLength(30, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
         [Remote("CheckUserAccount", "Account", null,
             ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST")]
+        [RegularExpression("^[a-zA-Z]+$",
+            ErrorMessage = "نام کاربری باید از حروف انگلیسی تشکیل شده باشد")]
         public string UserName { get; set; }
 
         [Display(Name = "ایمیل")]

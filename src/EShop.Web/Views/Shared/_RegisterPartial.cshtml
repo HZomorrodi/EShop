@@ -1,17 +1,17 @@
 ﻿@using EShop.ViewModels.Account
 @model RegisterViewModel;
-<form asp-action="Register" asp-controller="Account" id="registerForm"
+<form asp-action="Register" asp-controller="Account" id="registerForm" autocomplete="off"
 	  data-ajax="true"
 	  data-ajax-method="POST"
 	  data-ajax-loading="#spinner"
-	  data-ajax-begin="onBegin"
-	  data-ajax-complete="onComplete"
-	  data-ajax-success="onsuccess"
-	  data-ajax-failure="onfailure">
-	<div asp-validation-summary="All" class="text-danger" id="validationErrors"></div>
+	  data-ajax-begin="onBeginRegister"
+	  data-ajax-complete="onCompleteRegister"
+	  data-ajax-success="onsuccessRegister"
+	  data-ajax-failure="onfailureRegister">
+	<div asp-validation-summary="All" class="text-danger" id="validationErrorsRegister"></div>
 	<div class="my-3">
 		<label asp-for="UserName" class="form-label"></label>
-		<input asp-for="UserName" class="form-control">
+		<input asp-for="UserName" class="form-control" id="userNameRegister">
 		<span asp-validation-for="UserName" class="text-danger"></span>
 	</div>
 	<div class="mb-3">
@@ -24,7 +24,7 @@
 	</div>
 	<div class="mb-3">
 		<label asp-for="Password" class="form-label"></label>
-		<input asp-for="Password" class="form-control">
+		<input asp-for="Password" class="form-control" id="passwordRegister">
 		<span asp-validation-for="Password" class="text-danger"></span>
 	</div>
 	<div class="mb-3">

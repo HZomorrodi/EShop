@@ -30,17 +30,15 @@ function updateTotalPrice(btn, count) {
 	totalPriceElement.textContent = (unitPrice * count) + ' هزار تومان';
 }
 
-function onBegin() {
+function onBeginRegister() {
 	$("#registerForm button[type='submit']").addClass("disabled");
 	$("#registerForm .alert-success").addClass("d-none ");
-	$("#validationErrors  ul").empty();
+	$("#validationErrorsRegister ul").empty();
 }
-
-function onComplete() {
+function onCompleteRegister() {
 	$("#registerForm button[type='submit']").removeClass("disabled");
 }
-
-function onfailure (data, status, xhr)  {
+function onfailureRegister(data, status, xhr)  {
 	console.log("onerror Called")
 	console.log(status)
 	console.log("xhr")
@@ -50,10 +48,10 @@ function onfailure (data, status, xhr)  {
 	console.log(data.status)
 	let errors = data.responseJSON 
 	$.each(errors, function (i, error) {
-		$("#validationErrors ul").append("<li>" + error + "</li>");
+		$("#validationErrorsRegister ul").append("<li>" + error + "</li>");
 	});
 }
-function onsuccess  (data, status, xhr)  {
+function onsuccessRegister(data, status, xhr)  {
 	console.log("onsuccess Called")
 	console.log(status)
 	console.log("xhr")
@@ -63,5 +61,39 @@ function onsuccess  (data, status, xhr)  {
 	if (data === "Success") {
 		$("#registerForm input").val("");
 		$("#registerForm .alert-success").removeClass("d-none ");
+	}
+}
+function onBeginLogin() {
+	$("#loginrForm button[type='submit']").addClass("disabled");
+	$("#loginrForm .alert-success").addClass("d-none ");
+	$("#validationErrorsLogin ul").empty();
+}
+function onCompleteLogin() {
+	$("#loginrForm button[type='submit']").removeClass("disabled");
+}
+function onfailureLogin(data, status, xhr)  {
+	console.log("onerror Called")
+	console.log(status)
+	console.log("xhr")
+	console.log(xhr)
+	console.log("data")
+	console.log(data.responseText)
+	console.log(data.status)
+	let errors = data.responseJSON 
+	$.each(errors, function (i, error) {
+		$("#validationErrorsLogin ul").append("<li>" + error + "</li>");
+	});
+}
+function onsuccessLogin(data, status, xhr)  {
+	console.log("onsuccess Called")
+	console.log(status)
+	console.log("xhr")
+	console.log(xhr)
+	console.log("xhr")
+	console.log(data)
+	if (data === "Success") {
+		$("#loginrForm input").val("");
+		$("#loginrForm .alert-success").removeClass("d-none ");
     }
+	location.reload()
 }
