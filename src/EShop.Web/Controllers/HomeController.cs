@@ -33,7 +33,7 @@ namespace EShop.Web.Controllers
             //await _uow.SaveChangesAsync();
             return View();
         }
-       
+
         public IActionResult AddProduct()
         {
             return View();
@@ -61,10 +61,19 @@ namespace EShop.Web.Controllers
             await _uow.SaveChangesAsync();
             return View("RemoveAsync");
         }
-        [Authorize] 
+        [Authorize]
         public IActionResult Test()
         {
             return View();
+        }
+        public IActionResult RemoveProduct()
+        {
+            return View();
+        }
+        [HttpPost,ValidateAntiForgeryToken]
+        public IActionResult RemoveProduct(int id)
+        {
+            return Content($"id: {id} has removed");
         }
         public IActionResult Privacy()
         {

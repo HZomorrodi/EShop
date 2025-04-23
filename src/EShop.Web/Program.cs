@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<ConnectionStringsViewModel>(builder.Configuration.GetSection("ConnectionStrings"));
 builder.Services.Configure<EmailConfigsViewModel>(builder.Configuration.GetSection("EmailConfigs"));
 builder.Services.AddCustomServices();
- 
+
 builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
@@ -30,6 +30,9 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");    
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

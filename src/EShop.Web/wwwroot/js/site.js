@@ -59,7 +59,7 @@ function onsuccessRegister(data, status, xhr)  {
 	console.log("xhr")
 	console.log(data)
 	if (data === "Success") {
-		$("#registerForm input").val("");
+		$("#registerForm div").remove();
 		$("#registerForm .alert-success").removeClass("d-none ");
 	}
 }
@@ -94,6 +94,32 @@ function onsuccessLogin(data, status, xhr)  {
 	if (data === "Success") {
 		$("#loginrForm input").val("");
 		$("#loginrForm .alert-success").removeClass("d-none ");
-    }
-	location.reload()
+	}
+	if (window.location.pathname == "/Account/ConfirmationAccount") {
+		window.location.href = "/"
+	}
+	else
+	 location.reload()
 }
+
+const myModalEl = document.getElementById('loginModal')
+myModalEl.addEventListener('shown.bs.modal', event => {
+	$.ajax({
+		url: '/Account/LoadLoginPartial',
+		type: 'GET',
+		success: function (data) {
+			$("#login-tab-pane").html(data)
+			$.validator.unobtrusive.parse($('#loginModal'));
+		}
+	})
+})
+$("#signup-tab").on("click", function () {
+	$.ajax({
+		url: '/Account/LoadRegisterPartial',
+		type: 'GET',
+		success: function (data) {
+			$("#signup-tab-pane").html(data)
+			$.validator.unobtrusive.parse($('#loginModal'));
+		}
+	})
+});

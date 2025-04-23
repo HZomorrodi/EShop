@@ -7,6 +7,7 @@ using EShop.ViewModels.Account;
 using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -30,7 +31,7 @@ namespace EShop.Web.Controllers
             return Json(true);
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             List<string> errors = [];
@@ -63,7 +64,6 @@ namespace EShop.Web.Controllers
                 await EmailSenderService.SendEmailAsync(model.Email,
                     "فعال‌سازی حساب کاربری", body);
 
-
                 return Json("Success");
             }
             foreach (IdentityError error in result.Errors)
@@ -80,9 +80,9 @@ namespace EShop.Web.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(string returnUrl, LoginViewModel model)
+        public async Task<IActionResult> Login(string? returnUrl, LoginViewModel model)
         {
-            ViewData["returnUrl"] = returnUrl; 
+            ViewData["returnUrl"] = returnUrl;
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
@@ -161,6 +161,85 @@ namespace EShop.Web.Controllers
         public IActionResult ForgotPassword()
         {
             return View();
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPasswordAsync(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
+                return View(model);
+            }
+            User? user = await UserManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return View("ForgotPasswordConfirmation");
+            }
+            else if (!await UserManager.IsEmailConfirmedAsync(user))
+            {
+                ModelState.AddModelError("", "ابتدا حساب کاربری خود را فعال کنید");
+                return View();
+            }
+            else
+            {
+                string resetPasswordCode = await UserManager.GeneratePasswordResetTokenAsync(user);
+                string body = await RendererService.RenderViewToStringAsync(
+                    "~/Views/EmailTemplates/_ForgotPasswordEmailTemplate.cshtml",
+                    new ForgotPasswordEmailViewModel()
+                    {
+                        UserName = user.UserName,
+                        ResetPasswordCode = resetPasswordCode,
+                    });
+
+                await EmailSenderService.SendEmailAsync(model.Email,
+                    "باز نشانی روز عبور", body);
+                return View("ForgotPasswordConfirmation");
+            }
+        }
+
+        public IActionResult ResetPassword(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                return View("Error2");
+            }
+            ViewData["Token"] = code;
+            return View();
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            ViewData["Token"] = model.Token;
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
+                return View(model);
+            }
+            User user = await UserManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return View("ResetPasswordConfirmation");
+            }
+            IdentityResult result = await UserManager.ResetPasswordAsync(user, model.Token, model.Password);
+            if (result.Succeeded)
+            {
+                return View("ResetPasswordConfirmation");
+            }
+            foreach (IdentityError error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+            return View(model);
+        }
+
+        public PartialViewResult LoadLoginPartial()
+        {
+            return PartialView("_LoginPartial");
+        }
+        public PartialViewResult LoadRegisterPartial()
+        {
+            return PartialView("_RegisterPartial");
         }
 
     }
