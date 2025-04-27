@@ -36,3 +36,36 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* ==================== Admin start ==================== */
+.profile-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+.sidebar {
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 56px);
+    padding: 20px;
+    border-left: 1px solid #dee2e6;
+}
+
+.main-content {
+    padding: 20px;
+    min-height: calc(100vh - 56px);
+}
+
+.nav-link.active {
+    font-weight: bold;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+/* ==================== Admin end ==================== */
+.dropdown-item {
+    padding-right: 1.5rem;
+}
