@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EShop.Entities.Identity
 {
-    public class Role : IdentityRole<int>
+    public class Role() : IdentityRole<int>
     {
         public virtual ICollection<RoleClaim> RoleClaims { get; set; }
         public virtual ICollection<UserRole> UserRole { get; set; }

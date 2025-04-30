@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using EShop.Entities.Identity;
+using EShop.ViewModels.Roles;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -7,6 +8,7 @@ namespace EShop.Services.Contracts.Identity;
 
 public interface IRoleManagerService : IDisposable
 {
+    #region BaseClass
     Task<IdentityResult> CreateAsync(Role role);
     Task UpdateNormalizedRoleNameAsync(Role role);
     Task<IdentityResult> UpdateAsync(Role role);
@@ -28,4 +30,10 @@ public interface IRoleManagerService : IDisposable
     IQueryable<Role> Roles { get; }
     bool SupportsQueryableRoles { get; }
     bool SupportsRoleClaims { get; }
+    #endregion
+
+    #region CustomMethods
+    public Task<List<ShowRoles>> GetRolesPreviewAsync();
+    Task<Role> RoleToDelete(int id);
+    #endregion
 }

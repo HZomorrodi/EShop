@@ -45,7 +45,7 @@
                 <h4 class="mb-4">منوی مدیریت</h4>
                 <ul class="nav flex-column">
                     <li class="nav-item dropdown mb-2">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">داشبورد</a>
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت دسته بندی‌ها</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#">داشبورد اصلی</a></li>
                             <li><a class="dropdown-item" href="#">داشبورد مالی</a></li>
@@ -55,18 +55,15 @@
                     <li class="nav-item dropdown mb-2">
                         <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت کاربران</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">لیست کاربران</a></li>
-                            <li><a class="dropdown-item" href="#">افزودن کاربر جدید</a></li>
-                            <li><a class="dropdown-item" href="#">سطوح دسترسی</a></li>
-                            <li><a class="dropdown-item" href="#">گروه‌های کاربری</a></li>
+                            <li><a class="dropdown-item" asp-action="Index" asp-controller="User">لیست کاربران</a></li>
+                            <li><a class="dropdown-item" asp-action="Create" asp-controller="User">افزودن کاربر جدید</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown mb-2">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">تنظیمات سیستم</a>
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت نقش‌ها</a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">تنظیمات عمومی</a></li>
-                            <li><a class="dropdown-item" href="#">تنظیمات امنیتی</a></li>
-                            <li><a class="dropdown-item" href="#">پیکربندی ماژول‌ها</a></li>
+                            <li><a class="dropdown-item" asp-action="Index" asp-controller="Role">لیست نقش‌ها</a></li>
+                            <li><a class="dropdown-item" asp-action="Add" asp-controller="Role">افزودن نقش‌ جدید</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown mb-2">
