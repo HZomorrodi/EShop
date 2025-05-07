@@ -22,5 +22,6 @@ namespace EShop.Entities.Identity
         public string? LastName { get; set; }
         [NotMapped]
         public string FullName { get { return $"{FirstName} {LastName}"; } }
+        public bool IsActvie { get; set; }
     }
 }

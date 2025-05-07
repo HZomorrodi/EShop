@@ -24,19 +24,19 @@ namespace EShop.Services.EFServices.Identity
         private readonly IUnitOfWork _uow = uow;
         private readonly DbSet<Role> _roles = uow.Set<Role>();
 
-        public async Task<List<ShowRoles>> GetRolesPreviewAsync() 
+        public async Task<List<ShowRolesViewModel>> GetRolesPreviewAsync()
         {
-            return await _roles.Select(r => new ShowRoles()
+            return await _roles.Select(r => new ShowRolesViewModel()
             {
                 Id = r.Id,
-                Name = r.Name,
+                Title = r.Name,
                 UsersCount = r.UserRole.Count
             }).ToListAsync();
         }
 
-        public async Task<Role> RoleToDelete(int id)
+        public async Task<Role?> RoleToDelete(int id)
         {
-            return await _roles.FindAsync(id);
+            return await _roles.Where(r => !r.UserRole.Any()).SingleOrDefaultAsync(r => r.Id == id);
         }
 
          

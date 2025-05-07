@@ -11,20 +11,13 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace EShop.Web.Areas.Admin.Controllers
 {
     [Area(AreaConstants.AdminArea)]
-    public class RoleController : Controller
+    public class RoleController(IRoleManagerService roleManagerService) : Controller
     {
-        public RoleController(IRoleManagerService roleManagerService, IUnitOfWork uow)
-        {
-            RoleManagerService = roleManagerService;
-            Uow = uow;
-        }
-
-        public IRoleManagerService RoleManagerService { get; }
-        public IUnitOfWork Uow { get; }
+        private readonly IRoleManagerService _roleManagerService = roleManagerService;
 
         public async Task<IActionResult> Index()
         {
-            return View(await RoleManagerService.GetRolesPreviewAsync());
+            return View(await _roleManagerService.GetRolesPreviewAsync());
         }
         [HttpPost]
         public IActionResult CheckRoleAccount()
@@ -45,7 +38,7 @@ namespace EShop.Web.Areas.Admin.Controllers
                 {
                     Name = model.Name
                 };
-                Microsoft.AspNetCore.Identity.IdentityResult result = await RoleManagerService.CreateAsync(role);
+                Microsoft.AspNetCore.Identity.IdentityResult result = await _roleManagerService.CreateAsync(role);
                 if (result.Succeeded)
                 {
                     return RedirectToAction(nameof(Index));
@@ -53,9 +46,7 @@ namespace EShop.Web.Areas.Admin.Controllers
                 else
                 {
                     foreach (var error in result.Errors)
-                    {
                         ModelState.AddModelError("", error.Description);
-                    }
                 }
             }
             else
@@ -67,9 +58,12 @@ namespace EShop.Web.Areas.Admin.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            Role? role = await RoleManagerService.FindByIdAsync(id.ToString());
+            Role? role = await _roleManagerService.FindByIdAsync(id.ToString());
+            if (role is null)
+                return View("NotFound");
             EditRoleViewModel model = new()
             {
+                Id = role.Id,
                 Name = role.Name,
             };
             return View(model);
@@ -79,13 +73,13 @@ namespace EShop.Web.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                Role? role = await RoleManagerService.FindByIdAsync(model.Id.ToString());
+                Role? role = await _roleManagerService.FindByIdAsync(model.Id.ToString());
                 if (role == null)
                 {
                     return View(model);
                 }
                 role.Name = model.Name;
-                Microsoft.AspNetCore.Identity.IdentityResult result = await RoleManagerService.UpdateAsync(role);
+                Microsoft.AspNetCore.Identity.IdentityResult result = await _roleManagerService.UpdateAsync(role);
                 if (result.Succeeded)
                 {
                     return RedirectToAction(nameof(Index));
@@ -107,19 +101,19 @@ namespace EShop.Web.Areas.Admin.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(int id)
         {
-            Role role = await RoleManagerService.RoleToDelete(id);
+            Role role = await _roleManagerService.RoleToDelete(id);
             if (role == null)
             {
-                return View("Error");
+                return View("NotFound");
             }
-            Microsoft.AspNetCore.Identity.IdentityResult result = await RoleManagerService.DeleteAsync(role);
+            Microsoft.AspNetCore.Identity.IdentityResult result = await _roleManagerService.DeleteAsync(role);
             if (result.Succeeded)
             {
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                return View("Error");
+                return View("Error2");
             }
         }
     }

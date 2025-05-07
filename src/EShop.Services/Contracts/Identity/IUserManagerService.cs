@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using EShop.Entities.Identity;
+using EShop.ViewModels.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -112,4 +113,8 @@ public interface IUserManagerService : IDisposable
     bool SupportsUserLockout { get; }
     bool SupportsQueryableUsers { get; }
     IQueryable<User> Users { get; }
+    #region CustomMethods
+    Task<List<ShowUsersViewModel>> GetUsersPreviewAsync();
+    Task<User> UserToDelete(int id);
+    #endregion
 }

@@ -33,7 +33,7 @@ public interface IRoleManagerService : IDisposable
     #endregion
 
     #region CustomMethods
-    public Task<List<ShowRoles>> GetRolesPreviewAsync();
+    Task<List<ShowRolesViewModel>> GetRolesPreviewAsync();
     Task<Role> RoleToDelete(int id);
     #endregion
 }

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace EShop.ViewModels.Roles
 {
-    public class ShowRoles
+    public class ShowRolesViewModel
     {
         public int Id { get; set; }
         [DisplayName("عنوان")]
-        public string Name { get; set; }
+        public string Title { get; set; }
         [DisplayName("تعداد کاربران در این نقش")]
         public int UsersCount { get; set; }
     }

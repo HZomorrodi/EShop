@@ -1,0 +1,64 @@
+﻿@using EShop.Common.Constants
+@model IEnumerable<EShop.ViewModels.Users.ShowUsersViewModel>
+
+@{
+	ViewData["Title"] = "Index";
+}
+<h3>
+	@ViewData["Title"]
+	<br />
+	<a asp-action="Add" class="mt-3 btn btn-outline-info">افزودن کاربر جدید</a>
+</h3>
+<table class="table">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.UserName)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.FullName)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.CreatedDateTime)
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			<tr>
+				<td>
+					@item.UserName
+				</td>
+				<td>
+					@if (!string.IsNullOrWhiteSpace(item.FullName))
+					{
+						@Html.DisplayFor(modelItem => item.FullName)
+					}
+					else
+					{
+						<text>...</text>
+					}
+				</td>
+				<td>
+					@item.CreatedDateTime.DateTimeToPersian()
+				</td>
+				<td>
+					<a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">ویرایش</a>
+
+					<form asp-action="Delete" asp-route-id="@item.Id" class="d-inline">
+						@if (item.IsActvie)
+						{
+							<button type="submit" class="btn btn-danger">غیرفعال سازی</button>
+						}
+						else
+						{
+							<button type="submit" class="btn btn-success">فعال سازی</button>
+						}
+					</form>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
