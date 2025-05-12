@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 
 namespace EShop.ViewModels.Users
 {
-    public class AddUserViewModel
+    public class EditUserViewModel
     {
+        [HiddenInput]
+        public int Id { get; set; } 
         [Display(Name = "نام کاربری")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [MinLength(3, ErrorMessage = AttributesErrorMessages.MinErrorMessage)]

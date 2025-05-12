@@ -17,28 +17,35 @@ namespace EShop.Web.Areas.Admin.Controllers
         {
             return View(await _userManagerService.GetUsersPreviewAsync());
         }
-        public async Task<IActionResult> Add()
+        public IActionResult Add()
         {
             ViewBag.SelectedRoles = _roleManagerService.Roles.Select(x => x.Name).ToList();
-            return View();
+            return View(new AddUserViewModel());
         }
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(AddUserViewModel model)
         {
+            ViewBag.SelectedRoles = _roleManagerService.Roles.Select(x => x.Name).ToList();
+            if (!await _roleManagerService.CheckRolesAsync(model.SelectedRoles))
+            {
+                return View("Error2");
+            }
             if (ModelState.IsValid)
             {
                 User user = new()
                 {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    CreatedDateTime = DateTime.Now,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    IsActvie = true,
+                    Email = model.Email,
+                    UserName = model.UserName,
+                    EmailConfirmed = true,
+                    CreatedDateTime = DateTime.Now,
+                    IsActive = true,
                 };
                 Microsoft.AspNetCore.Identity.IdentityResult result = await _userManagerService.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    await _userManagerService.AddToRolesAsync(user, model.SelectedRoles);
                     return RedirectToAction("Index");
                 }
                 else
@@ -53,9 +60,80 @@ namespace EShop.Web.Areas.Admin.Controllers
             }
             return View(model);
         }
-        public ActionResult CheckUserName() 
+        public ActionResult CheckUserName()
         {
             return Json(true);
+        }
+        public async Task<IActionResult> Edit(int id)
+        {
+            ViewBag.SelectedRoles = _roleManagerService.Roles.Select(x => x.Name).ToList();
+            User? user = await _userManagerService.FindByIdAsync(id.ToString());
+            IList<string> roles = await _userManagerService.GetRolesAsync(user);
+            EditUserViewModel editUserViewModel = new()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                SelectedRoles = [.. roles],
+            };
+            return View(editUserViewModel);
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (!await _roleManagerService.CheckRolesAsync(model.SelectedRoles))
+                    return View("Error2");
+                User? user = await _userManagerService.FindByIdAsync(model.Id.ToString());
+                if (user is null)
+                {
+                    return View("NotFound");
+                }
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Email = model.Email;
+                user.UserName = model.UserName;
+                user.IsActive = true;
+                if (string.IsNullOrWhiteSpace(model.Password))
+                {
+                    user.PasswordHash = _userManagerService.PasswordHasher.HashPassword(user, model.Password);
+                }
+                Microsoft.AspNetCore.Identity.IdentityResult result = await _userManagerService.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    IList<string> roles = await _userManagerService.GetRolesAsync(user);
+                    await _userManagerService.RemoveFromRolesAsync(user, roles);
+                    await _userManagerService.AddToRolesAsync(user, model.SelectedRoles);
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> ChangeUserStatusAsync(int id)
+        {
+            User? user = await _userManagerService.FindByIdAsync(id.ToString());
+            if (user is null)
+                return View("NotFound"); 
+            user.IsActive = !user.IsActive;
+            Microsoft.AspNetCore.Identity.IdentityResult result = await _userManagerService.UpdateAsync(user);
+            if (!result.Succeeded)
+                return View("Error2");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

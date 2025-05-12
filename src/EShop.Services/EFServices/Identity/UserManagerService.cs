@@ -34,10 +34,11 @@ namespace EShop.Services.EFServices.Identity
         {
             return await _users.Select(u => new ShowUsersViewModel()
             {
+                Id = u.Id,
                 UserName = u.UserName,
                 CreatedDateTime = u.CreatedDateTime,
                 FullName = u.FullName,
-                IsActvie = u.IsActvie,
+                IsActvie = u.IsActive,
             }).ToListAsync();
         }
 
