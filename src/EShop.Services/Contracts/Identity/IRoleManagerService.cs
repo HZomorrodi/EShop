@@ -35,5 +35,6 @@ public interface IRoleManagerService : IDisposable
     #region CustomMethods
     Task<List<ShowRolesViewModel>> GetRolesPreviewAsync();
     Task<Role> RoleToDelete(int id);
+    Task<bool> CheckRolesAsync(List<string> SelectedRoles);
     #endregion
 }

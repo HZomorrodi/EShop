@@ -39,6 +39,10 @@ namespace EShop.Services.EFServices.Identity
             return await _roles.Where(r => !r.UserRole.Any()).SingleOrDefaultAsync(r => r.Id == id);
         }
 
-         
+        public async Task<bool> CheckRolesAsync(List<string> SelectedRoles)
+        {
+            int validItemCount = await _roles.CountAsync(r => SelectedRoles.Contains(r.Name));
+            return SelectedRoles.Count == validItemCount;
+        }
     }
 }
