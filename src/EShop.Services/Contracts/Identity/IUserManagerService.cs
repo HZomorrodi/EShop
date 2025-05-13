@@ -115,6 +115,6 @@ public interface IUserManagerService : IDisposable
     IQueryable<User> Users { get; }
     #region CustomMethods
     Task<List<ShowUsersViewModel>> GetUsersPreviewAsync();
-    Task<User> UserToDelete(int id);
+    Task<EditUserViewModel> GetUsersForEditAsync(int id);
     #endregion
 }

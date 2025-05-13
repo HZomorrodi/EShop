@@ -16,6 +16,6 @@ namespace EShop.ViewModels.Users
         public string FullName { get; set; }
         [DisplayName("تاریخ عضویت")]
         public DateTime CreatedDateTime { get; set; }
-        public bool IsActvie { get; set; }
+        public bool IsActive { get; set; }
     }
 }

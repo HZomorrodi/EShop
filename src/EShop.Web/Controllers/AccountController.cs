@@ -44,7 +44,8 @@ namespace EShop.Web.Controllers
             {
                 UserName = model.UserName,
                 Email = model.Email,
-                CreatedDateTime = DateTime.Now
+                CreatedDateTime = DateTime.Now,
+                IsActive = true,
             };
             IdentityResult result = await UserManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
@@ -97,6 +98,10 @@ namespace EShop.Web.Controllers
             {
                 ModelState.AddModelError("", "ابتدا حساب کاربری خود را فعال کنید");
             }
+            else if (!user.IsActive)
+            {
+                ModelState.AddModelError("", " حساب کاربری شما غیر فعال است");
+            }
             else
             {
                 Microsoft.AspNetCore.Identity.SignInResult result = await SignInManagerService.PasswordSignInAsync
@@ -129,6 +134,10 @@ namespace EShop.Web.Controllers
             else if (!await UserManager.IsEmailConfirmedAsync(user))
             {
                 errors.Add("ابتدا حساب کاربری خود را فعال کنید");
+            }
+            else if (!user.IsActive)
+            {
+                errors.Add(" حساب کاربری شما غیر فعال است");
             }
             else
             {

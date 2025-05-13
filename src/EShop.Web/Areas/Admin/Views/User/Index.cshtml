@@ -47,8 +47,8 @@
 				<td>
 					<a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">ویرایش</a>
 
-					<form asp-action="Delete" asp-route-id="@item.Id" class="d-inline">
-						@if (item.IsActvie)
+					<form asp-action="ChangeUserStatus" asp-route-id="@item.Id" class="d-inline">
+						@if (item.IsActive)
 						{
 							<button type="submit" class="btn btn-danger">غیرفعال سازی</button>
 						}

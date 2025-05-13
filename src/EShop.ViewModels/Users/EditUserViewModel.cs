@@ -24,18 +24,16 @@ namespace EShop.ViewModels.Users
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,})+)$", ErrorMessage = AttributesErrorMessages.RegularExpressionErrorMessage)]
         [MaxLength(50, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
-        public string Email { get; set; }
+        public required string  Email { get; set; }
         [Display(Name = "رمز عبور")]
-        [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [MinLength(6, ErrorMessage = AttributesErrorMessages.MinErrorMessage)]
         [MaxLength(50, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string? Password { get; set; }
         [Display(Name = "تکرار رمز عبور")]
-        [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [DataType(DataType.Password)]
         [Compare(nameof(Password), ErrorMessage =AttributesErrorMessages.CompareErrorMessage)]
-        public string ConfirmPassword { get; set; }
+        public string? ConfirmPassword { get; set; }
         [Display(Name = "نام")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [MinLength(3, ErrorMessage = AttributesErrorMessages.MinErrorMessage)]

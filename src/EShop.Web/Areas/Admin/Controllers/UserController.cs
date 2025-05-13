@@ -67,17 +67,9 @@ namespace EShop.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             ViewBag.SelectedRoles = _roleManagerService.Roles.Select(x => x.Name).ToList();
-            User? user = await _userManagerService.FindByIdAsync(id.ToString());
-            IList<string> roles = await _userManagerService.GetRolesAsync(user);
-            EditUserViewModel editUserViewModel = new()
-            {
-                Id = user.Id,
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                SelectedRoles = [.. roles],
-            };
+            EditUserViewModel editUserViewModel = await _userManagerService.GetUsersForEditAsync(id);
+            if (editUserViewModel is null)
+                return View("NotFound");
             return View(editUserViewModel);
         }
         [HttpPost, ValidateAntiForgeryToken]
@@ -87,17 +79,17 @@ namespace EShop.Web.Areas.Admin.Controllers
             {
                 if (!await _roleManagerService.CheckRolesAsync(model.SelectedRoles))
                     return View("Error2");
+               
                 User? user = await _userManagerService.FindByIdAsync(model.Id.ToString());
                 if (user is null)
-                {
                     return View("NotFound");
-                }
+
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.Email = model.Email;
                 user.UserName = model.UserName;
                 user.IsActive = true;
-                if (string.IsNullOrWhiteSpace(model.Password))
+                if (!string.IsNullOrWhiteSpace(model.Password))
                 {
                     user.PasswordHash = _userManagerService.PasswordHasher.HashPassword(user, model.Password);
                 }
@@ -128,7 +120,7 @@ namespace EShop.Web.Areas.Admin.Controllers
         {
             User? user = await _userManagerService.FindByIdAsync(id.ToString());
             if (user is null)
-                return View("NotFound"); 
+                return View("NotFound");
             user.IsActive = !user.IsActive;
             Microsoft.AspNetCore.Identity.IdentityResult result = await _userManagerService.UpdateAsync(user);
             if (!result.Succeeded)

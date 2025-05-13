@@ -30,6 +30,7 @@ namespace EShop.Services.EFServices.Identity
     {
         private readonly IUnitOfWork _uow = uow;
         private readonly DbSet<User> _users = uow.Set<User>();
+
         public async Task<List<ShowUsersViewModel>> GetUsersPreviewAsync()
         {
             return await _users.Select(u => new ShowUsersViewModel()
@@ -38,13 +39,26 @@ namespace EShop.Services.EFServices.Identity
                 UserName = u.UserName,
                 CreatedDateTime = u.CreatedDateTime,
                 FullName = u.FullName,
-                IsActvie = u.IsActive,
+                IsActive = u.IsActive,
             }).ToListAsync();
         }
 
-        public Task<User> UserToDelete(int id)
+        public async Task<EditUserViewModel> GetUsersForEditAsync(int id)
         {
-            throw new NotImplementedException();
+            User? user = await _users.FindAsync(id);
+            if (user is null)
+                return null;
+            IList<string> roles = await GetRolesAsync(user);
+            EditUserViewModel editUserViewModel = new()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                SelectedRoles = [.. roles],
+            };
+            return editUserViewModel;
         }
     }
 }
