@@ -11,7 +11,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace EShop.Web.Areas.Admin.Controllers
 {
     [Area(AreaConstants.AdminArea)]
-    public class RoleController(IRoleManagerService roleManagerService) : Controller
+    public class RoleController(IRoleManagerService roleManagerService) : BaseController
     {
         private readonly IRoleManagerService _roleManagerService = roleManagerService;
 

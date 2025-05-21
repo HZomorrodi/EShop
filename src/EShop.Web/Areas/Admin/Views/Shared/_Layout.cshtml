@@ -1,96 +1,101 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <title>@ViewData["Title"] - EShop.Web</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EShop.Web.styles.css" asp-append-version="true" />
-    @await RenderSectionAsync("Csss", required: false)
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>@ViewData["Title"] - EShop.Web</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/EShop.Web.styles.css" asp-append-version="true" />
+	@await RenderSectionAsync("Csss", required: false)
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-black">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link active" href="#">پنل مدیریت</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">مشاهده سایت</a></li>
-                </ul>
-                <ul class="navbar-nav pe-0">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <img src="https://picsum.photos/200/200?random=1" alt="پروفایل" class="profile-img">
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><h6 class="dropdown-header">سلام<br>محمد رضایی</h6></li>
-                            <li><a class="dropdown-item" href="#">ویرایش پروفایل</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#">خروج</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-black">
+		<div class="container-fluid">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item"><a class="nav-link active" href="#">پنل مدیریت</a></li>
+					<li class="nav-item"><a class="nav-link" href="#">مشاهده سایت</a></li>
+				</ul>
+				<ul class="navbar-nav pe-0">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+							<img src="https://picsum.photos/200/200?random=1" alt="پروفایل" class="profile-img">
+						</a>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li><h6 class="dropdown-header">سلام<br>@User.Claims.SingleOrDefault(c => c.Type == "FullName")?.Value</h6></li>
+							<li><a class="dropdown-item" href="#">ویرایش پروفایل</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li>
+								<form asp-action="Logout" asp-controller="Account" asp-area="">
+									<button type="submit" class="dropdown-item">خروج</button>
+									@*<a class="dropdown-item" href="#">خروج</a>*@
+								</form>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Right Sidebar (3 columns) -->
-            <div class="col-lg-3 sidebar">
-                <h4 class="mb-4">منوی مدیریت</h4>
-                <ul class="nav flex-column">
-                    <li class="nav-item dropdown mb-2">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت دسته بندی‌ها</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">داشبورد اصلی</a></li>
-                            <li><a class="dropdown-item" href="#">داشبورد مالی</a></li>
-                            <li><a class="dropdown-item" href="#">داشبورد کاربران</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown mb-2">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت کاربران</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" asp-action="Index" asp-controller="User">لیست کاربران</a></li>
-                            <li><a class="dropdown-item" asp-action="Add" asp-controller="User">افزودن کاربر جدید</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown mb-2">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت نقش‌ها</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" asp-action="Index" asp-controller="Role">لیست نقش‌ها</a></li>
-                            <li><a class="dropdown-item" asp-action="Add" asp-controller="Role">افزودن نقش‌ جدید</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown mb-2">
-                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">گزارشات آماری</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">گزارشات کاربران</a></li>
-                            <li><a class="dropdown-item" href="#">گزارشات مالی</a></li>
-                            <li><a class="dropdown-item" href="#">گزارشات ترافیک</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">گزارشات سفارشی</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+	<div class="container-fluid">
+		<div class="row">
+			<!-- Right Sidebar (3 columns) -->
+			<div class="col-lg-3 sidebar">
+				<h4 class="mb-4">منوی مدیریت</h4>
+				<ul class="nav flex-column">
+					<li class="nav-item dropdown mb-2">
+						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت دسته بندی‌ها</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">داشبورد اصلی</a></li>
+							<li><a class="dropdown-item" href="#">داشبورد مالی</a></li>
+							<li><a class="dropdown-item" href="#">داشبورد کاربران</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown mb-2">
+						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت کاربران</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" asp-action="Index" asp-controller="User">لیست کاربران</a></li>
+							<li><a class="dropdown-item" asp-action="Add" asp-controller="User">افزودن کاربر جدید</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown mb-2">
+						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت نقش‌ها</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" asp-action="Index" asp-controller="Role">لیست نقش‌ها</a></li>
+							<li><a class="dropdown-item" asp-action="Add" asp-controller="Role">افزودن نقش‌ جدید</a></li>
+						</ul>
+					</li>
+					<li class="nav-item dropdown mb-2">
+						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">گزارشات آماری</a>
+						<ul class="dropdown-menu">
+							<li><a class="dropdown-item" href="#">گزارشات کاربران</a></li>
+							<li><a class="dropdown-item" href="#">گزارشات مالی</a></li>
+							<li><a class="dropdown-item" href="#">گزارشات ترافیک</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item" href="#">گزارشات سفارشی</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
 
-            <!-- Main Content (9 columns) -->
-            <div class="col-lg-9 main-content">
-                <main role="main" class="pb-3">
-                    @RenderBody()
-                </main>
-            </div>
-        </div>
-    </div>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+			<!-- Main Content (9 columns) -->
+			<div class="col-lg-9 main-content">
+				<main role="main" class="pb-3">
+					@RenderBody()
+				</main>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 
-    <script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

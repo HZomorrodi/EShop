@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace EShop.Common.Constants
 {
-    public class LogCodes
+    public class IdentityRoleNames
     {
-        public const int RegisterCode = 1;
-        public const int LoginCode = 2;
-        public const int LogoutCode = 3;
+        public const string Admin = nameof(Admin);
+        public const string Customer = nameof(Customer);
     }
 }

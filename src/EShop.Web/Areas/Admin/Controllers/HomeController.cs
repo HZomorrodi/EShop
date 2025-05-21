@@ -2,7 +2,7 @@
 
 namespace EShop.Web.Areas.Admin.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         [Area(AreaConstants.AdminArea)]
         public IActionResult Index()

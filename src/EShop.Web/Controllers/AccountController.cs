@@ -8,6 +8,8 @@ using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -19,11 +21,11 @@ namespace EShop.Web.Controllers
         IEmailSenderService emailSenderService,
         ISignInManagerService signInManagerService) : Controller
     {
-        public ILogger<AccountController> Logger { get; } = logger;
-        public IUserManagerService UserManager { get; } = userManager;
-        public IViewRendererService RendererService { get; } = viewRendererService;
-        public IEmailSenderService EmailSenderService { get; } = emailSenderService;
-        public ISignInManagerService SignInManagerService { get; } = signInManagerService;
+        private readonly ILogger<AccountController> _logger = logger;
+        private readonly IUserManagerService _userManager = userManager;
+        private readonly IViewRendererService _rendererService = viewRendererService;
+        private readonly IEmailSenderService _emailSenderService = emailSenderService;
+        private readonly ISignInManagerService _signInManagerService = signInManagerService;
 
         [HttpPost]
         public IActionResult CheckUserAccount(string UserName)
@@ -47,13 +49,13 @@ namespace EShop.Web.Controllers
                 CreatedDateTime = DateTime.Now,
                 IsActive = true,
             };
-            IdentityResult result = await UserManager.CreateAsync(user, model.Password);
+            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                Logger.LogInformation(LogCodes.RegisterCode, $"{user.UserName} creates a new account");
-                string activationCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+                _logger.LogInformation(LogCodes.RegisterCode, $"{user.UserName} creates a new account");
+                string activationCode = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 //send Email
-                string body = await RendererService.RenderViewToStringAsync(
+                string body = await _rendererService.RenderViewToStringAsync(
                     "~/Views/EmailTemplates/_ActivationUserEmailTemplate.cshtml",
                     new RegisterEmailConfirmationViewModel()
                     {
@@ -62,7 +64,7 @@ namespace EShop.Web.Controllers
                         CreatedDateTime = user.CreatedDateTime.ToString()
                     });
 
-                await EmailSenderService.SendEmailAsync(model.Email,
+                await _emailSenderService.SendEmailAsync(model.Email,
                     "فعال‌سازی حساب کاربری", body);
 
                 return Json("Success");
@@ -74,7 +76,7 @@ namespace EShop.Web.Controllers
             return BadRequest(errors);
         }
 
-        public async Task<IActionResult> Login(string returnUrl)
+        public IActionResult Login(string returnUrl)
         {
             ViewData["returnUrl"] = returnUrl;
             return View();
@@ -89,12 +91,12 @@ namespace EShop.Web.Controllers
                 ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
                 return View(model);
             }
-            User user = await UserManager.FindByNameAsync(model.UserName);
-            if (user == null)
+            User? user = await _userManager.FindByNameAsync(model.UserName);
+            if (user is null)
             {
                 ModelState.AddModelError("", "نام کاربری یا رمز عبور اشتباه است");
             }
-            else if (!await UserManager.IsEmailConfirmedAsync(user))
+            else if (!await _userManager.IsEmailConfirmedAsync(user))
             {
                 ModelState.AddModelError("", "ابتدا حساب کاربری خود را فعال کنید");
             }
@@ -104,11 +106,17 @@ namespace EShop.Web.Controllers
             }
             else
             {
-                Microsoft.AspNetCore.Identity.SignInResult result = await SignInManagerService.PasswordSignInAsync
+                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManagerService.PasswordSignInAsync
                     (user, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    Logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} logged in.");
+                    _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} logged in.");
+                    IList<Claim> claims = await _userManager.GetClaimsAsync(user);
+                    if (!claims.Any(c => c.Type == "FullName"))
+                    {
+                        await _userManager.AddClaimAsync(user, new Claim("FullName",
+                              string.IsNullOrWhiteSpace(user.FullName) ? user.UserName : user.FullName));
+                    }
                     if (Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
                     return RedirectToAction(nameof(HomeController.Index), "Home");
@@ -126,12 +134,12 @@ namespace EShop.Web.Controllers
                 errors.Add(PublicConstantStrings.ModelStateErrorMessage);
                 return BadRequest(errors);
             }
-            User user = await UserManager.FindByNameAsync(model.UserName);
-            if (user == null)
+            User? user = await _userManager.FindByNameAsync(model.UserName);
+            if (user is null)
             {
                 errors.Add("نام کاربری یا رمز عبور اشتباه است");
             }
-            else if (!await UserManager.IsEmailConfirmedAsync(user))
+            else if (!await _userManager.IsEmailConfirmedAsync(user))
             {
                 errors.Add("ابتدا حساب کاربری خود را فعال کنید");
             }
@@ -141,11 +149,19 @@ namespace EShop.Web.Controllers
             }
             else
             {
-                Microsoft.AspNetCore.Identity.SignInResult result = await SignInManagerService.PasswordSignInAsync
+                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManagerService.PasswordSignInAsync
                     (user, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
-                    Logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} creates a new account");
+                    IList<Claim> claims = await _userManager.GetClaimsAsync(user);
+                    if (!claims.Any(c => c.Type == "FullName"))
+                    {
+                        await _userManager.AddClaimAsync(user, new Claim("FullName",
+                              string.IsNullOrWhiteSpace(user.FullName) ? user.UserName : user.FullName));
+                    }
+                    //await signInManagerService.SignOutAsync();
+                    //await signInManagerService.SignInAsync(user, model.RememberMe, "pwd");
+                    _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} creates a new account");
                     return Json("Success");
                 }
                 errors.Add("نام کاربری یا رمز عبور اشتباه است");
@@ -159,12 +175,12 @@ namespace EShop.Web.Controllers
             {
                 return View("Error2");
             }
-            User? user = await UserManager.FindByNameAsync(userName);
-            if (user == null)
+            User? user = await _userManager.FindByNameAsync(userName);
+            if (user is null)
             {
                 return View("NotFound");
             }
-            IdentityResult result = await UserManager.ConfirmEmailAsync(user, code);
+            IdentityResult result = await _userManager.ConfirmEmailAsync(user, code);
             return View(result.Succeeded ? nameof(ConfirmationAccount) : "Error2");
         }
         public IActionResult ForgotPassword()
@@ -179,20 +195,20 @@ namespace EShop.Web.Controllers
                 ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
                 return View(model);
             }
-            User? user = await UserManager.FindByEmailAsync(model.Email);
-            if (user == null)
+            User? user = await _userManager.FindByEmailAsync(model.Email);
+            if (user is null)
             {
                 return View("ForgotPasswordConfirmation");
             }
-            else if (!await UserManager.IsEmailConfirmedAsync(user))
+            else if (!await _userManager.IsEmailConfirmedAsync(user))
             {
                 ModelState.AddModelError("", "ابتدا حساب کاربری خود را فعال کنید");
                 return View();
             }
             else
             {
-                string resetPasswordCode = await UserManager.GeneratePasswordResetTokenAsync(user);
-                string body = await RendererService.RenderViewToStringAsync(
+                string resetPasswordCode = await _userManager.GeneratePasswordResetTokenAsync(user);
+                string body = await _rendererService.RenderViewToStringAsync(
                     "~/Views/EmailTemplates/_ForgotPasswordEmailTemplate.cshtml",
                     new ForgotPasswordEmailViewModel()
                     {
@@ -200,7 +216,7 @@ namespace EShop.Web.Controllers
                         ResetPasswordCode = resetPasswordCode,
                     });
 
-                await EmailSenderService.SendEmailAsync(model.Email,
+                await _emailSenderService.SendEmailAsync(model.Email,
                     "باز نشانی روز عبور", body);
                 return View("ForgotPasswordConfirmation");
             }
@@ -225,12 +241,12 @@ namespace EShop.Web.Controllers
                 ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
                 return View(model);
             }
-            User user = await UserManager.FindByEmailAsync(model.Email);
+            User? user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
                 return View("ResetPasswordConfirmation");
             }
-            IdentityResult result = await UserManager.ResetPasswordAsync(user, model.Token, model.Password);
+            IdentityResult result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
             if (result.Succeeded)
             {
                 return View("ResetPasswordConfirmation");
@@ -249,6 +265,18 @@ namespace EShop.Web.Controllers
         public PartialViewResult LoadRegisterPartial()
         {
             return PartialView("_RegisterPartial");
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> Logout()
+        {
+            User? user = User.Identity?.IsAuthenticated == true ? await _userManager.GetUserAsync(User) : null;
+            if (user is not null)
+            {
+                await _signInManagerService.SignOutAsync();
+                await _userManager.UpdateSecurityStampAsync(user);
+                _logger.LogInformation(LogCodes.LogoutCode, $"{user.UserName} logged out.");
+            }
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace EShop.Web.Areas.Admin.Controllers
 {
     [Area(AreaConstants.AdminArea)]
-    public class UserController(IUserManagerService userManagerService, IRoleManagerService roleManagerService) : Controller
+    public class UserController(IUserManagerService userManagerService, IRoleManagerService roleManagerService) : BaseController
     {
         private readonly IUserManagerService _userManagerService = userManagerService;
         private readonly IRoleManagerService _roleManagerService = roleManagerService;
