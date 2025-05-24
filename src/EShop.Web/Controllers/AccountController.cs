@@ -85,6 +85,10 @@ namespace EShop.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string? returnUrl, LoginViewModel model)
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
+            }
             ViewData["returnUrl"] = returnUrl;
             if (!ModelState.IsValid)
             {
