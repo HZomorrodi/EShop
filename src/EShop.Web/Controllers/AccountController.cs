@@ -78,6 +78,10 @@ namespace EShop.Web.Controllers
 
         public IActionResult Login(string returnUrl)
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+            }
             ViewData["returnUrl"] = returnUrl;
             return View();
         }
@@ -87,7 +91,7 @@ namespace EShop.Web.Controllers
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
             ViewData["returnUrl"] = returnUrl;
             if (!ModelState.IsValid)
@@ -116,10 +120,10 @@ namespace EShop.Web.Controllers
                 {
                     _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} logged in.");
                     IList<Claim> claims = await _userManager.GetClaimsAsync(user);
-                    if (!claims.Any(c => c.Type == "FullName"))
+                    if (!claims.Any(c => c.Type == IdentityClaimNames.FullName))
                     {
-                        await _userManager.AddClaimAsync(user, new Claim("FullName",
-                              string.IsNullOrWhiteSpace(user.FullName) ? user.UserName : user.FullName));
+                        await _userManager.AddClaimAsync(user, new Claim(IdentityClaimNames.FullName,
+                              string.IsNullOrWhiteSpace(user.FullName) ? user.UserName! : user.FullName));
                     }
                     if (Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
@@ -133,42 +137,49 @@ namespace EShop.Web.Controllers
         public async Task<IActionResult> NaveBarLogin(LoginViewModel model)
         {
             List<string> errors = [];
-            if (!ModelState.IsValid)
+            if (User.Identity?.IsAuthenticated == true)
             {
-                errors.Add(PublicConstantStrings.ModelStateErrorMessage);
-                return BadRequest(errors);
-            }
-            User? user = await _userManager.FindByNameAsync(model.UserName);
-            if (user is null)
-            {
-                errors.Add("نام کاربری یا رمز عبور اشتباه است");
-            }
-            else if (!await _userManager.IsEmailConfirmedAsync(user))
-            {
-                errors.Add("ابتدا حساب کاربری خود را فعال کنید");
-            }
-            else if (!user.IsActive)
-            {
-                errors.Add(" حساب کاربری شما غیر فعال است");
+                errors.Add("شما قبلا وارد سیستم شده اید");
             }
             else
             {
-                Microsoft.AspNetCore.Identity.SignInResult result = await _signInManagerService.PasswordSignInAsync
-                    (user, model.Password, model.RememberMe, false);
-                if (result.Succeeded)
+                if (!ModelState.IsValid)
                 {
-                    IList<Claim> claims = await _userManager.GetClaimsAsync(user);
-                    if (!claims.Any(c => c.Type == "FullName"))
-                    {
-                        await _userManager.AddClaimAsync(user, new Claim("FullName",
-                              string.IsNullOrWhiteSpace(user.FullName) ? user.UserName : user.FullName));
-                    }
-                    //await signInManagerService.SignOutAsync();
-                    //await signInManagerService.SignInAsync(user, model.RememberMe, "pwd");
-                    _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} creates a new account");
-                    return Json("Success");
+                    errors.Add(PublicConstantStrings.ModelStateErrorMessage);
+                    return BadRequest(errors);
                 }
-                errors.Add("نام کاربری یا رمز عبور اشتباه است");
+                User? user = await _userManager.FindByNameAsync(model.UserName);
+                if (user is null)
+                {
+                    errors.Add("نام کاربری یا رمز عبور اشتباه است");
+                }
+                else if (!await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    errors.Add("ابتدا حساب کاربری خود را فعال کنید");
+                }
+                else if (!user.IsActive)
+                {
+                    errors.Add(" حساب کاربری شما غیر فعال است");
+                }
+                else
+                {
+                    Microsoft.AspNetCore.Identity.SignInResult result = await _signInManagerService.PasswordSignInAsync
+                        (user, model.Password, model.RememberMe, false);
+                    if (result.Succeeded)
+                    {
+                        IList<Claim> claims = await _userManager.GetClaimsAsync(user);
+                        if (!claims.Any(c => c.Type == IdentityClaimNames.FullName))
+                        {
+                            await _userManager.AddClaimAsync(user, new Claim(IdentityClaimNames.FullName,
+                                  string.IsNullOrWhiteSpace(user.FullName) ? user.UserName! : user.FullName));
+                        }
+                        //await signInManagerService.SignOutAsync();
+                        //await signInManagerService.SignInAsync(user, model.RememberMe, "pwd");
+                        _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} creates a new account");
+                        return Json("Success");
+                    }
+                    errors.Add("نام کاربری یا رمز عبور اشتباه است");
+                }
             }
             return BadRequest(errors);
         }

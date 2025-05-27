@@ -85,9 +85,11 @@ function onfailureLogin(data, status, xhr) {
     console.log(data.responseText);
     console.log(data.status);
     let errors = data.responseJSON;
-    $.each(errors, function (i, error) {
+       $.each(errors, function (i, error) {
         $("#validationErrorsLogin ul").append("<li>" + error + "</li>");
-    });
+       });
+    if (errors[0] == 'شما قبلا وارد سیستم شده اید')
+        location.reload();
 }
 
 function onsuccessLogin(data, status, xhr) {
