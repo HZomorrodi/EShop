@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EShop.Web.Areas.Admin.Controllers
 {
-    [Authorize(Roles = $"{IdentityRoleNames.Admin},{IdentityRoleNames.Customer}")]
+    [Authorize(Roles = $"{IdentityRoleNames.Admin}")]
     public class BaseController : Controller
     {
         

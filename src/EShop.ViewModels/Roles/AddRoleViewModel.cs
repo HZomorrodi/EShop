@@ -15,7 +15,7 @@ namespace EShop.ViewModels.Roles
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [MaxLength(100, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
         [Remote("CheckRoleAccount", "Role", "Admin",
-            ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST")]
+            ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST", AdditionalFields = ViewModelConstants.AntiForgeryToken)]
         public string Name { get; set; }
     }
 }

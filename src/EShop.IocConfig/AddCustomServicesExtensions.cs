@@ -62,6 +62,11 @@ namespace EShop.IocConfig
                 AddRoleManager<RoleManagerService>().
                 AddSignInManager<SignInManagerService>().
                 AddDefaultTokenProviders();
+            services.AddAuthentication().AddGoogle(Options =>
+            {
+                Options.ClientSecret = "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";
+                Options.ClientId = "860741161447-12k9seic3pgpi6gadj5f8t2115d39r5v.apps.googleusercontent.com";
+            });
             services.AddRazorViewRenderer();
             return services;
         }

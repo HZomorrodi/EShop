@@ -27,12 +27,21 @@ namespace EShop.Web.Controllers
         private readonly IEmailSenderService _emailSenderService = emailSenderService;
         private readonly ISignInManagerService _signInManagerService = signInManagerService;
 
-        [HttpPost]
-        public IActionResult CheckUserAccount(string UserName)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckUserAccount(string userName)
         {
-            return Json(true);
+            User? user = await _userManager.FindByNameAsync(userName);
+            if (user is null)
+                return Json(true);
+            return Json(false);
         }
-
+        public async Task<IActionResult> CheckEmail(string email)
+        {
+            User? user = await _userManager.FindByEmailAsync(email);
+            if (user is null)
+                return Json(true);
+            return Json(false);
+        }
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
@@ -292,6 +301,11 @@ namespace EShop.Web.Controllers
                 _logger.LogInformation(LogCodes.LogoutCode, $"{user.UserName} logged out.");
             }
             return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
 
     }

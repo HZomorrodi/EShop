@@ -19,10 +19,13 @@ namespace EShop.Web.Areas.Admin.Controllers
         {
             return View(await _roleManagerService.GetRolesPreviewAsync());
         }
-        [HttpPost]
-        public IActionResult CheckRoleAccount()
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckRoleAccountAsync(string name)
         {
-            return Json(true);
+            Role? role = await _roleManagerService.FindByNameAsync(name);
+            if (role is null)
+                return Json(true);
+            return Json(false);
         }
         public IActionResult Add()
         {
