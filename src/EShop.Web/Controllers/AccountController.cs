@@ -85,14 +85,18 @@ namespace EShop.Web.Controllers
             return BadRequest(errors);
         }
 
-        public IActionResult Login(string returnUrl)
+        public async Task<IActionResult> Login(string returnUrl)
         {
+            LoginViewModel model = new()
+            {
+                ExternalLogins = [.. await _signInManagerService.GetExternalAuthenticationSchemesAsync()],
+            };
             if (User.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
             ViewData["returnUrl"] = returnUrl;
-            return View();
+            return View(model);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -304,6 +308,10 @@ namespace EShop.Web.Controllers
         }
 
         public IActionResult AccessDenied()
+        {
+            return View();
+        }
+        public IActionResult ExternalLogin(string provider, string returnUrl)
         {
             return View();
         }

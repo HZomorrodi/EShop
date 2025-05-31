@@ -33,5 +33,16 @@
                 <input type="submit" value="ورود" class="btn btn-primary w-100" />
             </div>
         </form>
+        <div class="my-3 text-center">
+            ورود با
+            <form asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl="@ViewData["returnUrl"]">
+                @foreach (var provider in Model.ExternalLogins)
+                {
+                    <button type="submit" name="provider" value="@provider.Name" class="btn btn-primary">
+                        @provider.DisplayName
+                    </button>
+                }
+            </form>
+        </div>
     </div>
 </div>
