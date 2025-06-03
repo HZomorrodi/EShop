@@ -13,8 +13,8 @@ public interface ISignInManagerService
     bool IsSignedIn(ClaimsPrincipal principal);
     Task<bool> CanSignInAsync(User user);
     Task RefreshSignInAsync(User user);
-    Task SignInAsync(User user, bool isPersistent, string? authenticationMethod);
-    Task SignInAsync(User user, AuthenticationProperties authenticationProperties, string? authenticationMethod);
+    Task SignInAsync(User user, bool isPersistent, string? authenticationMethod = null);
+    Task SignInAsync(User user, AuthenticationProperties authenticationProperties, string? authenticationMethod = null);
     Task SignInWithClaimsAsync(User user, bool isPersistent, IEnumerable<Claim> additionalClaims);
     Task SignInWithClaimsAsync(User user, AuthenticationProperties? authenticationProperties, IEnumerable<Claim> additionalClaims);
     Task SignOutAsync();
@@ -34,9 +34,9 @@ public interface ISignInManagerService
     Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey, bool isPersistent);
     Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey, bool isPersistent, bool bypassTwoFactor);
     Task<IEnumerable<AuthenticationScheme>> GetExternalAuthenticationSchemesAsync();
-    Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf);
+    Task<ExternalLoginInfo?> GetExternalLoginInfoAsync(string? expectedXsrf = null);
     Task<IdentityResult> UpdateExternalAuthenticationTokensAsync(ExternalLoginInfo externalLogin);
-    AuthenticationProperties ConfigureExternalAuthenticationProperties(string? provider, string? redirectUrl, string? userId);
+    AuthenticationProperties ConfigureExternalAuthenticationProperties(string? provider, string? redirectUrl, string? userId = null);
     Task<bool> IsTwoFactorEnabledAsync(User user);
     ILogger Logger { get; set; }
     UserManager<User> UserManager { get; set; }

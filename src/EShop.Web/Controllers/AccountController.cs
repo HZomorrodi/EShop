@@ -311,9 +311,45 @@ namespace EShop.Web.Controllers
         {
             return View();
         }
+        [HttpPost, ValidateAntiForgeryToken]
         public IActionResult ExternalLogin(string provider, string returnUrl)
         {
-            return View();
+            if (returnUrl == "/Account/ConfirmationAccount")
+            {
+                returnUrl = string.Empty;
+            }
+            string? redirectUrl = Url.Action("ExternalLoginCallBack", "Account", new { area = "", returnUrl });
+            Microsoft.AspNetCore.Authentication.AuthenticationProperties properties =
+                _signInManagerService.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
+        }
+        public async Task<IActionResult> ExternalLoginCallBackAsync(string returnUrl, string remoteError)
+        {
+            ViewData["returnUrl"] = returnUrl;
+            LoginViewModel model = new()
+            {
+                ExternalLogins = [.. await _signInManagerService.GetExternalAuthenticationSchemesAsync()],
+            };
+            if (remoteError is not null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error : {remoteError}");
+                return View(nameof(Login), model);
+            }
+            ExternalLoginInfo? externalLoginInfo = await _signInManagerService.GetExternalLoginInfoAsync();
+            if (externalLoginInfo == null)
+            {
+                ModelState.AddModelError(string.Empty, "خطایی به وجود آمد، مجددا تلاش نماید");
+                return View(nameof(Login), model);
+            }
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = await _signInManagerService.ExternalLoginSignInAsync(externalLoginInfo.LoginProvider, externalLoginInfo.ProviderKey, true, true);
+            if (signInResult.Succeeded)
+            {
+                if (Url.IsLocalUrl(returnUrl))
+                    return Redirect(returnUrl);
+                return RedirectToAction(nameof(HomeController.Index), "Home", new { area = string.Empty });
+            }
+            string? email = externalLoginInfo.Principal.Claims.SingleOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+            return Ok();
         }
 
     }
