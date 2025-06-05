@@ -119,6 +119,8 @@ if (myModalEl) {
             success: function (data) {
                 $("#login-tab-pane").html(data);
                 $.validator.unobtrusive.parse($('#loginModal'));
+                var currentpath = window.location.pathname
+                $("form#external-login-form").attr("action", `/Account/ExternalLogin?returnUrl=${currentpath}`) 
             }
         });
     });

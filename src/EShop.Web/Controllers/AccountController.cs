@@ -8,6 +8,7 @@ using Humanizer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -91,6 +92,7 @@ namespace EShop.Web.Controllers
             {
                 ExternalLogins = [.. await _signInManagerService.GetExternalAuthenticationSchemesAsync()],
             };
+
             if (User.Identity?.IsAuthenticated == true)
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
@@ -316,14 +318,14 @@ namespace EShop.Web.Controllers
         {
             if (returnUrl == "/Account/ConfirmationAccount")
             {
-                returnUrl = string.Empty;
+                returnUrl = "/";
             }
-            string? redirectUrl = Url.Action("ExternalLoginCallBack", "Account", new { area = "", returnUrl });
+            string? redirectUrl = Url.Action(nameof(ExternalLoginCallBack), "Account", new { area = "", returnUrl });
             Microsoft.AspNetCore.Authentication.AuthenticationProperties properties =
                 _signInManagerService.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
-        public async Task<IActionResult> ExternalLoginCallBackAsync(string returnUrl, string remoteError)
+        public async Task<IActionResult> ExternalLoginCallBack(string returnUrl, string remoteError)
         {
             ViewData["returnUrl"] = returnUrl;
             LoginViewModel model = new()
@@ -348,8 +350,39 @@ namespace EShop.Web.Controllers
                     return Redirect(returnUrl);
                 return RedirectToAction(nameof(HomeController.Index), "Home", new { area = string.Empty });
             }
-            string? email = externalLoginInfo.Principal.Claims.SingleOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
-            return Ok();
+            string? email = externalLoginInfo.Principal.FindFirstValue(ClaimTypes.Email);
+            if (email is null)
+            {
+                return View("Error2");
+            }
+            User? user = await _userManager.FindByEmailAsync(email);
+            if (user is null)
+            {
+                user = new()
+                {
+                    UserName = Guid.NewGuid().ToString("N"),
+                    Email = email,
+                    IsActive = true,
+                    EmailConfirmed = true,
+                    CreatedDateTime = DateTime.Now,
+                    UserClaims =
+                    [
+                        new()
+                        {
+                            ClaimType = IdentityClaimNames.FullName,
+                            ClaimValue = "- - -"
+                        }
+                    ]
+                };
+                _logger.LogInformation(LogCodes.RegisterCode, $"{user.UserName} creates a new account");
+                await _userManager.CreateAsync(user);
+            }
+            _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} logged in.");
+            await _userManager.AddLoginAsync(user, externalLoginInfo);
+            await _signInManagerService.SignInAsync(user, true);
+            if (Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+            return RedirectToAction(nameof(HomeController.Index), "Home", new { area = string.Empty });
         }
 
     }

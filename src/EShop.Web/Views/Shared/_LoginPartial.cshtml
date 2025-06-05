@@ -1,40 +1,58 @@
-﻿@using EShop.ViewModels.Account
+﻿@using EShop.Services.Contracts.Identity
+@using EShop.ViewModels.Account
 @model LoginViewModel;
+@inject ISignInManagerService _signInManagerService;
+@{
+    IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalLogins = await _signInManagerService.GetExternalAuthenticationSchemesAsync();
+}
 <form asp-action="NaveBarLogin" asp-controller="Account" id="loginrForm" autocomplete="off"
-	  data-ajax="true"
-	  data-ajax-method="POST"
-	  data-ajax-loading="#spinner"
-	  data-ajax-begin="onBeginLogin"
-	  data-ajax-complete="onCompleteLogin"
-	  data-ajax-success="onsuccessLogin"
-	  data-ajax-failure="onfailureLogin">
-	<div asp-validation-summary="All" class="text-danger" id="validationErrorsLogin"></div>
-	<div class="my-3">
-		<label asp-for="UserName" class="form-label"></label>
-		<input asp-for="UserName" class="form-control" id="userNameLogin">
-		<span asp-validation-for="UserName" class="text-danger"></span>
-	</div>
-	<div class="mb-3">
-		<label asp-for="Password" class="form-label"></label>
-		<input asp-for="Password" class="form-control" id="passwordLogin">
-		<span asp-validation-for="Password" class="text-danger"></span>
-	</div>
-	<div class="mb-3">
-		<input type="checkbox" class="form-check-input" asp-for="RememberMe">
-		<label class="form-check-label" asp-for="RememberMe"></label>
-	</div>
+      data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-loading="#spinner"
+      data-ajax-begin="onBeginLogin"
+      data-ajax-complete="onCompleteLogin"
+      data-ajax-success="onsuccessLogin"
+      data-ajax-failure="onfailureLogin">
+    <div asp-validation-summary="All" class="text-danger" id="validationErrorsLogin"></div>
+    <div class="my-3">
+        <label asp-for="UserName" class="form-label"></label>
+        <input asp-for="UserName" class="form-control" id="userNameLogin">
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" id="passwordLogin">
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <input type="checkbox" class="form-check-input" asp-for="RememberMe">
+        <label class="form-check-label" asp-for="RememberMe"></label>
+    </div>
 
-	<button type="submit" class="btn btn-primary" id="loginBtn">ورود</button>
-	<a asp-action="ForgotPassword" asp-controller="Account" asp-area="" class="my-3 d-block">رمز عبور خود را اشتباه وارد کرده‌اید؟</a>
-	<div class="spinner-border me-4" role="status" id="spinner" style="display:none">
-		<span class="visually-hidden">Loading...</span>
-	</div>
+    <button type="submit" class="btn btn-primary" id="loginBtn">ورود</button>
+    <a asp-action="ForgotPassword" asp-controller="Account" asp-area="" class="my-3 d-block">رمز عبور خود را اشتباه وارد کرده‌اید؟</a>
+    <div class="spinner-border me-4" role="status" id="spinner" style="display:none">
+        <span class="visually-hidden">Loading...</span>
+    </div>
 
 
-	<p class="mt-3 alert alert-success d-none">
-		ورود شما با موفقیت انجام شد.
-	 <br />
-	 در حال انتقال ...
-	</p>
+    <p class="mt-3 alert alert-success d-none">
+        ورود شما با موفقیت انجام شد.
+        <br />
+        در حال انتقال ...
+    </p>
 </form>
-
+@if (externalLogins?.Any() == true)
+{
+    <div class="my-3 text-center">
+        ورود با
+        <form asp-controller="Account" asp-action="ExternalLogin" id="external-login-form">
+            @foreach (var provider in externalLogins)
+            {
+                <button type="submit" name="provider" value="@provider.Name" class="btn btn-primary">
+                    @provider.DisplayName
+                </button>
+            }
+        </form>
+    </div>
+}

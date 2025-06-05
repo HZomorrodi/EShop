@@ -23,6 +23,6 @@ namespace EShop.ViewModels.Account
 
         [Display(Name = "مرا به خاطر بسپار")]
         public bool RememberMe { get; set; }
-        public List<Microsoft.AspNetCore.Authentication.AuthenticationScheme> ExternalLogins { get; set; }
+        public List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>? ExternalLogins { get; set; }
     }
 }
