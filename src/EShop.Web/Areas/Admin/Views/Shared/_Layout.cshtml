@@ -28,8 +28,8 @@
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end">
 							<li><h6 class="dropdown-header">سلام<br>@User.Claims.SingleOrDefault(c => c.Type == IdentityClaimNames.FullName)?.Value</h6></li>
-							<li><a class="dropdown-item" href="#">ویرایش پروفایل</a></li>
 							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item" asp-action="EditAccount" asp-controller="Account" asp-area="">ویرایش پروفایل</a></li>
 							<li>
 								<form asp-action="Logout" asp-controller="Account" asp-area="">
 									<button type="submit" class="dropdown-item">خروج</button>

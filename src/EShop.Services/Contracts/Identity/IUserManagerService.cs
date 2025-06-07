@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using EShop.Entities.Identity;
+using EShop.ViewModels.Account;
 using EShop.ViewModels.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -116,5 +117,6 @@ public interface IUserManagerService : IDisposable
     #region CustomMethods
     Task<List<ShowUsersViewModel>> GetUsersPreviewAsync();
     Task<EditUserViewModel> GetUsersForEditAsync(int id);
+    Task<EditAccountViewModel?> GetUserForEditAccountAsync(int id);
     #endregion
 }

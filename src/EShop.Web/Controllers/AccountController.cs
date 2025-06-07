@@ -3,6 +3,7 @@ using EShop.Common.Mvc;
 using EShop.Entities.Identity;
 using EShop.Services.Contracts;
 using EShop.Services.Contracts.Identity;
+using EShop.Services.EFServices.Identity;
 using EShop.ViewModels.Account;
 using Humanizer;
 using Microsoft.AspNetCore.Identity;
@@ -324,6 +325,60 @@ namespace EShop.Web.Controllers
             Microsoft.AspNetCore.Authentication.AuthenticationProperties properties =
                 _signInManagerService.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
+        }
+        public async Task<IActionResult> EditAccount()
+        {
+            string? currentUserId = User.Claims.SingleOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value;
+            bool succeed = int.TryParse(currentUserId, out int userId);
+            EditAccountViewModel? model = null;
+            if (succeed)
+            {
+                model = await _userManager.GetUserForEditAccountAsync(userId);
+            }
+            else if (!succeed || model is null)
+            {
+                return View("Error2");
+            }
+            return View(model);
+        }
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditAccount(EditAccountViewModel model)
+        {
+            if (ModelState.IsValid) 
+            {
+                string? currentUserId = User.Claims.SingleOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value;
+                User? user = await userManager.FindByIdAsync(currentUserId);
+                if (user is null)
+                    return View("Error2");
+
+                user.UserName = model.UserName;
+                user.LastName = model.LastName;
+                user.FirstName = model.FirstName;
+                user.Email = model.Email;
+
+                if (!string.IsNullOrWhiteSpace(model.Password))
+                {
+                    user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, model.Password);
+                }
+                IdentityResult result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    await _signInManagerService.RefreshSignInAsync(user).ConfigureAwait(false);
+                    return RedirectToAction(nameof(HomeController.Index), "Home");
+                }
+                else
+                {
+                    foreach (IdentityError error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
+            }
+            return View(model);
         }
         public async Task<IActionResult> ExternalLoginCallBack(string returnUrl, string remoteError)
         {

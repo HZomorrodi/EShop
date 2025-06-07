@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EShop.DataLayer.Context;
 using EShop.Entities.Identity;
 using EShop.Services.Contracts.Identity;
+using EShop.ViewModels.Account;
 using EShop.ViewModels.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,22 @@ namespace EShop.Services.EFServices.Identity
                 LastName = user.LastName,
                 Email = user.Email,
                 SelectedRoles = [.. roles],
+            };
+            return editUserViewModel;
+        }
+
+        public async Task<EditAccountViewModel?> GetUserForEditAccountAsync(int id)
+        {
+            User? user = await _users.FindAsync(id);
+            if (user is null)
+                return null;
+            EditAccountViewModel editUserViewModel = new()
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
             };
             return editUserViewModel;
         }
