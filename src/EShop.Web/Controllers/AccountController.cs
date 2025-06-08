@@ -30,7 +30,7 @@ namespace EShop.Web.Controllers
         private readonly ISignInManagerService _signInManagerService = signInManagerService;
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> CheckUserAccount(string userName)
+        public async Task<IActionResult> CheckUserName(string userName)
         {
             User? user = await _userManager.FindByNameAsync(userName);
             if (user is null)

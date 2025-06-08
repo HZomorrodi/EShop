@@ -60,10 +60,7 @@ namespace EShop.Web.Areas.Admin.Controllers
             }
             return View(model);
         }
-        public ActionResult CheckUserName()
-        {
-            return Json(true);
-        }
+        
         public async Task<IActionResult> Edit(int id)
         {
             ViewBag.SelectedRoles = _roleManagerService.Roles.Select(x => x.Name).ToList();

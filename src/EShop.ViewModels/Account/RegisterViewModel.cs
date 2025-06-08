@@ -15,7 +15,7 @@ namespace EShop.ViewModels.Account
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [MinLength(3, ErrorMessage = AttributesErrorMessages.MinErrorMessage)]
         [MaxLength(30, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
-        [Remote("CheckUserAccount", "Account", null,
+        [Remote("CheckUserName", "Account", null,
             ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST",
             AdditionalFields = ViewModelConstants.AntiForgeryToken)]
         [RegularExpression(@"^\w+$",
