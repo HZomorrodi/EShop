@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -30,8 +31,15 @@ namespace EShop.Web.Controllers
         private readonly ISignInManagerService _signInManagerService = signInManagerService;
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> CheckUserName(string userName)
+        public async Task<IActionResult> CheckUserName(string userName, int? id)
         {
+            if (User.Identity?.IsAuthenticated == true && id is not null)
+            {
+                //User? currentUser = await _userManager.FindByIdAsync(id.ToString()!);
+                //if (string.Equals(userName, currentUser?.UserName, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(userName, User.Identity.Name, StringComparison.OrdinalIgnoreCase))
+                    return Json(true);
+            }
             User? user = await _userManager.FindByNameAsync(userName);
             if (user is null)
                 return Json(true);
@@ -39,6 +47,11 @@ namespace EShop.Web.Controllers
         }
         public async Task<IActionResult> CheckEmail(string email)
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (string.Equals(email, User.FindFirstValue(ClaimTypes.Email), StringComparison.OrdinalIgnoreCase))
+                    return Json(true);
+            }
             User? user = await _userManager.FindByEmailAsync(email);
             if (user is null)
                 return Json(true);
@@ -135,12 +148,12 @@ namespace EShop.Web.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} logged in.");
-                    IList<Claim> claims = await _userManager.GetClaimsAsync(user);
-                    if (!claims.Any(c => c.Type == IdentityClaimNames.FullName))
-                    {
-                        await _userManager.AddClaimAsync(user, new Claim(IdentityClaimNames.FullName,
-                              string.IsNullOrWhiteSpace(user.FullName) ? user.UserName! : user.FullName));
-                    }
+                    //IList<Claim> claims = await _userManager.GetClaimsAsync(user);
+                    //if (!claims.Any(c => c.Type == IdentityClaimNames.FullName))
+                    //{
+                    //    await _userManager.AddClaimAsync(user, new Claim(IdentityClaimNames.FullName,
+                    //          string.IsNullOrWhiteSpace(user.FullName) ? user.UserName! : user.FullName));
+                    //}
                     if (Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);
                     return RedirectToAction(nameof(HomeController.Index), "Home");
@@ -183,12 +196,12 @@ namespace EShop.Web.Controllers
                         (user, model.Password, model.RememberMe, false);
                     if (result.Succeeded)
                     {
-                        IList<Claim> claims = await _userManager.GetClaimsAsync(user);
-                        if (!claims.Any(c => c.Type == IdentityClaimNames.FullName))
-                        {
-                            await _userManager.AddClaimAsync(user, new Claim(IdentityClaimNames.FullName,
-                                  string.IsNullOrWhiteSpace(user.FullName) ? user.UserName! : user.FullName));
-                        }
+                        //IList<Claim> claims = await _userManager.GetClaimsAsync(user);
+                        //if (!claims.Any(c => c.Type == IdentityClaimNames.FullName))
+                        //{
+                        //    await _userManager.AddClaimAsync(user, new Claim(IdentityClaimNames.FullName,
+                        //          string.IsNullOrWhiteSpace(user.FullName) ? user.UserName! : user.FullName));
+                        //}
                         //await signInManagerService.SignOutAsync();
                         //await signInManagerService.SignInAsync(user, model.RememberMe, "pwd");
                         _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} creates a new account");
@@ -344,7 +357,7 @@ namespace EShop.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> EditAccount(EditAccountViewModel model)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 string? currentUserId = User.Claims.SingleOrDefault(u => u.Type == ClaimTypes.NameIdentifier)?.Value;
                 User? user = await userManager.FindByIdAsync(currentUserId);

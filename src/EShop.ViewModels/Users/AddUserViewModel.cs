@@ -16,12 +16,17 @@ namespace EShop.ViewModels.Users
         [MinLength(3, ErrorMessage = AttributesErrorMessages.MinErrorMessage)]
         [MaxLength(50, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
         [RegularExpression(@"^\w+$", ErrorMessage = "نام کاربری باید از حروف انگلیسی تشکیل شده باشد")]
-        [Remote("CheckUserName", "Account", null, ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, AdditionalFields = ViewModelConstants.AntiForgeryToken)]
+        [Remote("CheckUserName", "Account", null,
+            ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST",
+            AdditionalFields = ViewModelConstants.AntiForgeryToken)]
         public string UserName { get; set; }
         [Display(Name = "ایمیل")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [RegularExpression(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,})+)$", ErrorMessage = AttributesErrorMessages.RegularExpressionErrorMessage)]
         [MaxLength(50, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
+        [Remote("CheckEmail", "Account", null,
+            ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST",
+            AdditionalFields = ViewModelConstants.AntiForgeryToken)]
         public string Email { get; set; }
         [Display(Name = "رمز عبور")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]

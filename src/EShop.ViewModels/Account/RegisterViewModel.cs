@@ -27,7 +27,8 @@ namespace EShop.ViewModels.Account
         [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
     ErrorMessage = AttributesErrorMessages.RegularExpressionErrorMessage)]
         [Remote("CheckEmail", "Account", null,
-        ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST", AdditionalFields = ViewModelConstants.AntiForgeryToken)]
+            ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST",
+            AdditionalFields = ViewModelConstants.AntiForgeryToken)]
         [MaxLength(100, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
         public string Email { get; set; }
         [Display(Name = "رمز عبور")]

@@ -60,7 +60,7 @@ namespace EShop.Web.Areas.Admin.Controllers
             }
             return View(model);
         }
-        
+
         public async Task<IActionResult> Edit(int id)
         {
             ViewBag.SelectedRoles = _roleManagerService.Roles.Select(x => x.Name).ToList();
@@ -76,7 +76,7 @@ namespace EShop.Web.Areas.Admin.Controllers
             {
                 if (!await _roleManagerService.CheckRolesAsync(model.SelectedRoles))
                     return View("Error2");
-               
+
                 User? user = await _userManagerService.FindByIdAsync(model.Id.ToString());
                 if (user is null)
                     return View("NotFound");
@@ -120,6 +120,7 @@ namespace EShop.Web.Areas.Admin.Controllers
                 return View("NotFound");
             user.IsActive = !user.IsActive;
             Microsoft.AspNetCore.Identity.IdentityResult result = await _userManagerService.UpdateAsync(user);
+            await _userManagerService.UpdateSecurityStampAsync(user);
             if (!result.Succeeded)
                 return View("Error2");
             return RedirectToAction(nameof(Index));

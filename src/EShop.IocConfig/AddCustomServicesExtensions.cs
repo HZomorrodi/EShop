@@ -31,6 +31,9 @@ namespace EShop.IocConfig
 
             #region RegisterIdentityServices
 
+            services.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimService>();
+            services.AddScoped<UserClaimsPrincipalFactory<User, Role>, UserClaimService>();
+
             services.AddScoped<IRoleManagerService, RoleManagerService>();
             services.AddScoped<RoleManager<Role>, RoleManagerService>();
 
@@ -62,6 +65,7 @@ namespace EShop.IocConfig
                 AddRoleManager<RoleManagerService>().
                 AddSignInManager<SignInManagerService>().
                 AddDefaultTokenProviders();
+            services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
             services.AddAuthentication().AddGoogle(Options =>
             {
                 Options.ClientSecret = "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";
