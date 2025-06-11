@@ -1,4 +1,5 @@
 ﻿@using EShop.Common.Constants
+@using EShop.Common.Extensions
 @using EShop.ViewModels.Account
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -53,7 +54,8 @@
                                             <img src="https://picsum.photos/200/200?random=1" alt="پروفایل" class="profile-img rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
                                         </a>
                                         <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><h6 class="dropdown-header">سلام<br>@User.Claims.SingleOrDefault(c => c.Type == IdentityClaimNames.FullName)?.Value</h6></li>
+                                            @* <li><h6 class="dropdown-header">سلام<br>@User.Claims.SingleOrDefault(c => c.Type == IdentityClaimNames.FullName)?.Value</h6></li> *@
+                                            <li><h6 class="dropdown-header">سلام<br>@User.Identity?.GetUserFullName()</h6></li>
                                             @if (User.IsInRole(IdentityRoleNames.Admin))
                                             {
                                                 <li><hr class="dropdown-divider"></li>

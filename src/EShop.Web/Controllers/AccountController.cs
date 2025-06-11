@@ -145,7 +145,7 @@ namespace EShop.Web.Controllers
             {
                 Microsoft.AspNetCore.Identity.SignInResult result = await _signInManagerService.PasswordSignInAsync
                     (user, model.Password, model.RememberMe, false);
-                if (result.Succeeded)
+                    if (result.Succeeded)
                 {
                     _logger.LogInformation(LogCodes.LoginCode, $"{user.UserName} logged in.");
                     //IList<Claim> claims = await _userManager.GetClaimsAsync(user);
@@ -376,7 +376,7 @@ namespace EShop.Web.Controllers
                 IdentityResult result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    await _signInManagerService.RefreshSignInAsync(user).ConfigureAwait(false);
+                    await _signInManagerService.RefreshSignInAsync(user);
                     return RedirectToAction(nameof(HomeController.Index), "Home");
                 }
                 else
@@ -433,14 +433,14 @@ namespace EShop.Web.Controllers
                     IsActive = true,
                     EmailConfirmed = true,
                     CreatedDateTime = DateTime.Now,
-                    UserClaims =
-                    [
-                        new()
-                        {
-                            ClaimType = IdentityClaimNames.FullName,
-                            ClaimValue = "- - -"
-                        }
-                    ]
+                    //UserClaims =
+                    //[
+                    //    new()
+                    //    {
+                    //        ClaimType = IdentityClaimNames.FullName,
+                    //        ClaimValue = "- - -"
+                    //    }
+                    //]
                 };
                 _logger.LogInformation(LogCodes.RegisterCode, $"{user.UserName} creates a new account");
                 await _userManager.CreateAsync(user);
