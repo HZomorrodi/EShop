@@ -26,7 +26,7 @@ namespace EShop.IocConfig
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
             ServiceProvider serviceProvider = services.BuildServiceProvider();
-            ConnectionStringsViewModel connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStringsViewModel>>().CurrentValue;
+            ConnectionStringsModel connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStringsModel>>().CurrentValue;
             services.AddDbContext<EShopDbContext>(options => options.UseSqlServer(connectionStrings.EShopDbContextConnection));
 
             #region RegisterIdentityServices
@@ -55,6 +55,7 @@ namespace EShop.IocConfig
 
             services.AddScoped<IUnitOfWork, EShopDbContext>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
 
             services.AddIdentity<User, Role>(setupAction).

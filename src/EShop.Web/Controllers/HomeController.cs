@@ -8,30 +8,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 
 namespace EShop.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(ILogger<HomeController> logger, IProductService productService, ICategoryService categoryService, IUnitOfWork uow) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<HomeController> _logger = logger;
 
-        public IProductService _productService { get; }
-        public IUnitOfWork _uow { get; }
+        public IProductService _productService { get; } = productService;
+        private readonly ICategoryService categoryService = categoryService;
+        public IUnitOfWork _uow { get; } = uow;
 
-        public HomeController(ILogger<HomeController> logger, IProductService productService, IUnitOfWork uow)
-        {
-            _logger = logger;
-            _productService = productService;
-            _uow = uow;
-        }
-
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             //Product prouducts = _productService.FindById(7);
             //prouducts.First().Description = "des151";
             //_productService.Remove(2);
             //await _uow.SaveChangesAsync();
-            return View();
+            return View(await categoryService.GetAllFieldsAsync2());
         }
 
         public IActionResult AddProduct()
@@ -70,7 +65,7 @@ namespace EShop.Web.Controllers
         {
             return View();
         }
-        [HttpPost,ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public IActionResult RemoveProduct(int id)
         {
             return Content($"id: {id} has removed");

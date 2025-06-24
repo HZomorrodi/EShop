@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EShop.ViewModels.Application
 {
-    public class EmailConfigsViewModel
+    public class EmailConfigsModel
     {
         public string SiteTitle { get; set; }
         public string SiteAddress { get; set; }

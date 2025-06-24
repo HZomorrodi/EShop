@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EShop.ViewModels.App
 {
-    public class ConnectionStringsViewModel
+    public class ConnectionStringsModel
     {
         public string EShopDbContextConnection { get; set; }
     }

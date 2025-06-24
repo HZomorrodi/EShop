@@ -85,9 +85,9 @@ function onfailureLogin(data, status, xhr) {
     console.log(data.responseText);
     console.log(data.status);
     let errors = data.responseJSON;
-       $.each(errors, function (i, error) {
+    $.each(errors, function (i, error) {
         $("#validationErrorsLogin ul").append("<li>" + error + "</li>");
-       });
+    });
     if (errors[0] == 'شما قبلا وارد سیستم شده اید')
         location.reload();
 }
@@ -120,7 +120,7 @@ if (myModalEl) {
                 $("#login-tab-pane").html(data);
                 $.validator.unobtrusive.parse($('#loginModal'));
                 var currentpath = window.location.pathname
-                $("form#external-login-form").attr("action", `/Account/ExternalLogin?returnUrl=${currentpath}`) 
+                $("form#external-login-form").attr("action", `/Account/ExternalLogin?returnUrl=${currentpath}`)
             }
         });
     });
@@ -133,6 +133,29 @@ $("#signup-tab").on("click", function () {
         success: function (data) {
             $("#signup-tab-pane").html(data);
             $.validator.unobtrusive.parse($('#loginModal'));
+        }
+    });
+});
+
+$(document).on('click', '[data-bs-target="#category-children-modal"]', function (event) {
+    event.preventDefault(); // Stop Bootstrap from opening the modal
+    const triggerButton = $(this);
+    const id = triggerButton.data('id');
+    const title = triggerButton.data('title');
+
+    $('#category-children-modal .modal-header span').html(title);
+    $('#category-children-modal img').removeClass('d-none');
+
+    $.ajax({
+        url: '/Admin/Category/ShowCategoryChildren',
+        type: 'GET',
+        data: { mainCatId: id },
+        success: function (data) {
+            $('#category-children-modal .modal-body').html(data);
+            $('#category-children-modal').modal('show'); // Manually open modal
+        },
+        complete: function () {
+            $('#category-children-modal img').addClass('d-none');
         }
     });
 });

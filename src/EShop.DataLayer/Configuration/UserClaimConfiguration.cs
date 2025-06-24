@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EShop.DataLayer.Configuration
 {
-    public class UserClaimConfiguration :IEntityTypeConfiguration<UserClaim>
+    public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
     {
         public void Configure(EntityTypeBuilder<UserClaim> builder)
         {

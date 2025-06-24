@@ -58,8 +58,11 @@ namespace EShop.Services.EFServices
 
         public void Remove(int id)
         {
-            TEntity entity = new() { Id = id };
-            _entity.Remove(entity);
+            var tEntity = new TEntity();
+            var idProperty = typeof(TEntity).GetProperty("Id") ?? throw new Exception("The entity doesn't have Id field!");
+            idProperty.SetValue(tEntity, id, null);
+            _uow.MarkAsDeleted(tEntity);
+
         }
 
         public List<TEntity> GetAll()
