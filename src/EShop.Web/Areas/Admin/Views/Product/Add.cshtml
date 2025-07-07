@@ -1,0 +1,168 @@
+﻿@model EShop.ViewModels.Products.AddProductViewModel
+
+@{
+    ViewData["Title"] = "Index38";
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-4"> 
+        <form asp-action="Add" enctype="multipart/form-data" id="add-product-form"   >
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" id="product-description"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId" class="control-label"></label>
+                <select asp-for="CategoryId" asp-items="@ViewBag.MainCategories" id="main-categories-element" class="form-control"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryChildrenId" class="control-label"></label>
+                <select asp-for="CategoryChildrenId" class="form-control" id="category-children-element"></select>
+                <span asp-validation-for="CategoryChildrenId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Images" class="control-label"></label>
+                <input asp-for="Images" class="form-control" accept="image/*" />
+                <span asp-validation-for="Images" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Properties" class="control-label"></label>
+                <input type="text" id="product-property-title" class="form-control" maxlength="100"  placeholder="عنوان ویژگی"/>
+                <input type="text" id="product-property-value" class="form-control" maxlength="100" placeholder="مقدار ویژگی" />
+                <input type="button" id="product-property-button" value="افزودن" class="my-3 btn btn-success" />
+                <br />
+                <div id="product-properties">
+                    @foreach (var property in Model.Properties)
+                    {
+                        <p>
+                            @Html.Encode(property)
+                            <button type="button" class="btn btn-danger remove-property-btn">حذف</button>
+                        </p>
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+
+            <div class="toast-container position-fixed bottom-0 start-0 p-3">
+                <div id="myToastEl" class="toast bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body"></div>
+                    
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    <script src="~/lib/ckeditor/ckeditor.js"></script>
+    <script>
+ 
+        $(function() {
+            // Initialize on page load and on change
+            $('#main-categories-element').change(loadSubCategories);
+            $('#product-property-button').click(addProductProperty);
+            CKEDITOR.replace('product-description',
+                {
+                    language: 'fa',
+                    contentsCss: ["body {font-family: 'Vazir'}"]
+                });
+            loadSubCategories();
+            
+            function loadSubCategories() {
+            // Clear existing options first
+            $("#category-children-element").empty();
+            $('#category-children-element').append(
+            $('<option></option>').val(0).text("انتخاب کنید"))
+            var mainCategoryId = $("#main-categories-element").val();
+            if (!mainCategoryId) return;  // Skip if no category selected
+
+            $.ajax({
+                url: '/Admin/Product/GetSubCategories',
+                data: { mainCategoryId },
+                success: function(data) {
+                    // Add new options
+                    $.each(data, function(index, element) {
+                        $('#category-children-element').append(
+                            $('<option></option>')
+                                .val(element.id)
+                                .text(element.title)
+                                .prop("selected",element.id === @Model.CategoryChildrenId)
+                        );
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading subcategories:", error);
+                }
+            });  
+        }
+
+               function addProductProperty() {
+            const propertyTitle = $("#product-property-title");
+            const propertyValue = $("#product-property-value");
+
+            if (isNullOrWhiteSpace(propertyTitle)) {
+                showToast('لطفا عنوان ویژگی را وارد نمایید');
+                return;
+            }
+
+            if (isNullOrWhiteSpace(propertyValue)) {
+                showToast('لطفا مقدار ویژگی را وارد نمایید');
+                return;
+            }
+
+            // Create the new property element
+            const newProperty = $('<p></p>')
+                .text(`${propertyTitle.val()} ||| ${propertyValue.val()} `)
+                .append(
+                    $('<button></button>')
+                        .addClass('btn btn-danger')
+                        .text('حذف')
+                        .on('click', function() {
+                            $(this).parent().remove();
+                        })
+                );
+
+            // Add to DOM and clear inputs
+            $("#product-properties").append(newProperty);
+            propertyTitle.val('');
+            propertyValue.val('');
+        }
+
+        // Helper function for toast notifications
+        function showToast(message) {
+            const toast = $('#myToastEl');
+            toast.find('.toast-body').text(message);
+            bootstrap.Toast.getOrCreateInstance(toast).show();
+        }
+        function isNullOrWhiteSpace(str) {
+            return !str.val()  || str.val().trim().length === 0;
+        }
+            $(document).on('click', '.remove-property-btn', function() {
+            const $parent = $(this).closest('p');
+            const property = $parent.data('property'); // Optional: access encoded data
+            $parent.remove();
+        });
+                });        
+    </script>
+    }
