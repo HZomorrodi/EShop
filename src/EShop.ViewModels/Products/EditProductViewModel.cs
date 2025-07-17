@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace EShop.ViewModels.Products
 {
-    public class EditProductViewModel
+    public class 
+        EditProductViewModel
     {
         [HiddenInput]
         public int Id { get; set; }
@@ -36,10 +37,9 @@ namespace EShop.ViewModels.Products
         public int CategoryChildrenId { get; set; }
 
         [Display(Name = "عکس های محصول")]
-        [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
-        public List<IFormFile>? Images { get; set; }
+        public List<IFormFile>? Images { get; set; } = [];
 
-        public List<string> ProductImages { get; set; }
+        public List<string>? ProductImages { get; set; } = [];
 
         [Display(Name = "ویژگی های محصول")]
         public List<string> Properties { get; set; } = [];

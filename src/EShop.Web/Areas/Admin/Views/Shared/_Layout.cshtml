@@ -47,40 +47,7 @@
 		<div class="row">
 			<!-- Right Sidebar (3 columns) -->
 			<div class="col-lg-3 sidebar">
-				<h4 class="mb-4">منوی مدیریت</h4>
-				<ul class="nav flex-column">
-					<li class="nav-item dropdown mb-2">
-						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت دسته بندی‌ها</a>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" asp-action="Index" asp-controller="Category">لیست تمامی دسته بندی ها</a></li>
-							<li><a class="dropdown-item" asp-action="Add" asp-controller="Category">افزودن دسته جدید</a></li>
-						</ul>
-					</li>
-					<li class="nav-item dropdown mb-2">
-						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت کاربران</a>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" asp-action="Index" asp-controller="User">لیست کاربران</a></li>
-							<li><a class="dropdown-item" asp-action="Add" asp-controller="User">افزودن کاربر جدید</a></li>
-						</ul>
-					</li>
-					<li class="nav-item dropdown mb-2">
-						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت نقش‌ها</a>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" asp-action="Index" asp-controller="Role">لیست نقش‌ها</a></li>
-							<li><a class="dropdown-item" asp-action="Add" asp-controller="Role">افزودن نقش‌ جدید</a></li>
-						</ul>
-					</li>
-					<li class="nav-item dropdown mb-2">
-						<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">گزارشات آماری</a>
-						<ul class="dropdown-menu">
-							<li><a class="dropdown-item" href="#">گزارشات کاربران</a></li>
-							<li><a class="dropdown-item" href="#">گزارشات مالی</a></li>
-							<li><a class="dropdown-item" href="#">گزارشات ترافیک</a></li>
-							<li><hr class="dropdown-divider"></li>
-							<li><a class="dropdown-item" href="#">گزارشات سفارشی</a></li>
-						</ul>
-					</li>
-				</ul>
+				<partial name="_AdminMenusPartial" />
 			</div>
 
 			<!-- Main Content (9 columns) -->

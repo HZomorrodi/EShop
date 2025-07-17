@@ -9,15 +9,20 @@ using EShop.ViewModels.Categories;
 using EShop.ViewModels.Products;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace EShop.Web.Areas.Admin.Controllers
 {
     [Area(AreaConstants.AdminArea)]
-    public class ProductController(IProductService productService, ICategoryService categoryService, IUnitOfWork uow) : BaseController
+    public class ProductController(IProductService productService,
+                                   ICategoryService categoryService,
+                                   IProductImageService productImageService,
+                                   IUnitOfWork uow) : BaseController
     {
         private readonly IProductService productService = productService;
         private readonly ICategoryService categoryService = categoryService;
+        private readonly IProductImageService productImageService = productImageService;
         private readonly IUnitOfWork uow = uow;
         public ActionResult Index()
         {
@@ -40,7 +45,7 @@ namespace EShop.Web.Areas.Admin.Controllers
                 ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
                 List<ShowCategory> categories = await categoryService.AllMainCategoriesAsync();
                 ViewBag.MainCategories = categories.ToList().CreateSelectListItem(addChooseOneItem: false, selectedItem: model.CategoryId);
-                return View(new AddProductViewModel());
+                return View(model);
             }
             Product product = new()
             {
@@ -92,16 +97,16 @@ namespace EShop.Web.Areas.Admin.Controllers
                 ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
                 List<ShowCategory> categories = await categoryService.AllMainCategoriesAsync();
                 ViewBag.MainCategories = categories.ToList().CreateSelectListItem(addChooseOneItem: false, selectedItem: model.CategoryId);
-                return View(new AddProductViewModel());
+                return View(model);
             }
             Product? product = await productService.GetProductToUpdateAsync(id);
 
             if (product?.ProductImages.Count == 0 && model?.Images?.Count == 0)
             {
-                ModelState.AddModelError("", "لطفا حداقل یک عکس را برای محصول انتخاب کنید");
+                ModelState.AddModelError(nameof(EditProductViewModel.Images), "لطفا حداقل یک عکس را برای محصول انتخاب کنید");
                 List<ShowCategory> categories = await categoryService.AllMainCategoriesAsync();
                 ViewBag.MainCategories = categories.ToList().CreateSelectListItem(addChooseOneItem: false, selectedItem: model.CategoryId);
-                return View(new AddProductViewModel());
+                return View(model);
             }
             product.CategoryId = model.CategoryChildrenId;
             product.Title = model.Title;
@@ -146,6 +151,23 @@ namespace EShop.Web.Areas.Admin.Controllers
             catch
             {
                 return View();
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RemoveProductPicture(string imageName)
+        {
+            ProductImage? productImage = await productImageService.RemoveProductImageByNameAsync(imageName);
+            if (productImage is null)
+            {
+                return Json(false);
+            }
+            else
+            {
+                WorkWithImages.RemoveImage(imageName, "products");
+                productImageService.Remove(productImage);
+                await uow.SaveChangesAsync();
+                return Json(true);
             }
         }
 

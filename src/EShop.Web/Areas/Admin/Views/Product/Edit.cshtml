@@ -1,7 +1,8 @@
-﻿@model EShop.ViewModels.Products.AddProductViewModel
+﻿@model EShop.ViewModels.Products.EditProductViewModel
 
 @{
-    ViewData["Title"] = "ایجاد محصول";
+    var df = Model;
+    ViewData["Title"] = "ویرایش محصول";
 }
 
 <h3>
@@ -12,8 +13,9 @@
 <hr />
 <div class="row">
     <div class="col-md-12">
-        <form asp-action="Add" enctype="multipart/form-data" id="add-product-form">
+        <form asp-action="Edit" enctype="multipart/form-data" id="edit-product-form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Id" />
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -38,10 +40,17 @@
                 <select asp-for="CategoryChildrenId" class="form-control" id="category-children-element"></select>
                 <span asp-validation-for="CategoryChildrenId" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="product-images-place">
                 <label asp-for="Images" class="control-label"></label>
-                <input asp-for="Images" class="form-control" accept="image/*" />
+                <input asp-for="Images" class="form-control" accept="image/*" id="file-input" />
                 <span asp-validation-for="Images" class="text-danger"></span>
+                @foreach (var item in Model.ProductImages)
+                {
+                    <div>
+                        <img src="/images/products/@item" width="100" class="img-thumbnail" />
+                        <button type="button" class="btn btn-danger remove-image-btn">حذف</button>
+                    </div>
+                }
             </div>
             <div class="form-group">
                 <label asp-for="Properties" class="control-label"></label>
@@ -60,7 +69,7 @@
                 </div>
             </div>
             <div class="form-group my-3">
-                <input type="submit" value="ایجاد" class="btn btn-primary" />
+                <input type="submit" value="ویرایش" class="btn btn-primary" />
             </div>
 
             <div class="toast-container position-fixed bottom-0 start-0 p-3">
@@ -122,7 +131,7 @@
                 propertyValue.val('');
             });
 
-            $('#add-product-form').on('submit', function(e) {
+            $('#edit-product-form').on('submit', function(e) {
                 e.preventDefault();
                 const $form = $(this);
                 const editor = CKEDITOR.instances['product-description'];
@@ -131,6 +140,11 @@
                 // 1. Validate CKEditor content
                 if (!editor.getData().trim()) {
                     $errorSpan.text('لطفا توضیحات را وارد نمایید').addClass('text-danger');
+                    return false;
+                }
+                else if ($('#product-images-place img').length === 0 && $('input[name="@Html.NameFor(x => x.Images)"]')[0]?.files?.length === 0) {
+                    $('#product-images-place span').text('لطفا عکس های محصول را وارد نمایید');
+                    $('#product-images-place input').focus();
                     return false;
                 }
                 $errorSpan.empty().removeClass('text-danger');
@@ -150,8 +164,22 @@
                     );
                 });
 
+                $form.find('input[name="@Html.NameFor(x => x.ProductImages)"]').remove(); // Clear existing
+                const $productImages = [];
+
+                $('#product-images-place img').each(function() {
+                    const src = $(this).attr("src").split('/').pop();
+                    $productImages.push(
+                        $('<input/>', {
+                            type: 'hidden',
+                            name: '@Html.NameFor(x => x.ProductImages)',
+                            value: src // XSS-safe via jQuery creation
+                        })
+                    );
+                });
+
                 // 3. Submit handling
-                $form.append($properties).off('submit').trigger('submit'); // Prevent recursion
+                $form.append([...$properties, ...$productImages]).off('submit').trigger('submit'); // Prevent recursion
             });
 
             // Functions
@@ -206,11 +234,51 @@
                 }
             });
 
-            // Delegated Event Handler
+            $('#product-images-place input[type="file"]').on('change', validateProductImages);
+
+            function validateProductImages() {
+                const hasExistingImages = $('#product-images-place img').length > 0;
+                const fileInput = $('#product-images-place input[type="file"]')[0];
+                const hasNewFiles = fileInput?.files?.length > 0;
+                const $errorSpan = $('#product-images-place span');
+
+                if (!hasExistingImages && !hasNewFiles) {
+                    $errorSpan.text('لطفا حداقل یک عکس برای محصول انتخاب نمایید');
+                } else {
+                    $errorSpan.text('');
+                }
+            }
+
+            // Delegated Event Handlers
             $(document).on('click', '.remove-property-btn', function() {
                 const $parent = $(this).closest('p');
                 const property = $parent.data('property'); // Optional: access encoded data
                 $parent.remove();
+            });
+
+            $(document).on('click', '.remove-image-btn', function() {
+                const $button = $(this);
+                const $img = $button.siblings('img');
+                const imageSrc = $img.attr("src");
+                const imageName = imageSrc.split('/').pop();
+
+                $.ajax({
+                    url: '/Admin/Product/RemoveProductPicture',
+                    type: 'POST',
+                    data: {
+                        imageName,
+                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    success: function() {
+                        $button.closest('div').remove();
+                        validateProductImages();
+                        showToast('تصویر با موفقیت حذف شد');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error deleting image:", error);
+                        showToast('خطا در حذف تصویر');
+                    }
+                });
             });
 
             // Initial Load
