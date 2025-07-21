@@ -1,0 +1,61 @@
+﻿@using System.Net
+@model EShop.ViewModels.Products.ProductDetailsViewModel
+
+@{
+    ViewData["Title"] = $"جزییات محصول {Model.Title}";
+}
+ 
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <img id="main-product-image" src="/images/products/@Model.Images.First()" class="img-thumbnail" alt="@Model.Title" style="width: 100%" />
+            @foreach (var image in Model.Images)
+            {
+                <img src="/images/products/@image" class="img-thumbnail" width="100" style="cursor: pointer" onclick="changeImage(this)" />
+            }
+        </div>
+        <div class="col-md-8">
+            <h3>
+                @Model.Title
+            </h3>
+            <hr />
+            <p>
+                ویژگی های محصول
+            </p>
+            @foreach (var property in Model.Properties)
+            {
+                var splittedProperty = property.Split("|||", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                <p>
+                    @splittedProperty[0]
+                    :
+                    @splittedProperty[1]
+                </p>
+            }
+            <hr />
+            <h2>
+                @Model.Price.ToString("#,0")
+                تومان
+            </h2>
+            <br />
+            <form data-ajax="true"
+                  data-ajax-begin="beginOnAddToCart"
+                  data-ajax-success="successOnAddToCart"
+                  data-ajax-complete="completeOnAddToCart"
+                  asp-controller="Cart" asp-action="Add" id="add-to-cart-form">
+                <button type="submit" name="productId" value="@Model.Id" class="btn btn-outline-success btn-lg mb-3">
+                    <i class="bi bi-cart-check-fill"></i>
+                    <span>افزودن به سبد خرید</span>
+                    <img class="d-none" width="20" src="/images/application/loading.gif" alt="صبر کنید" />
+                </button>
+            </form>
+            <div>
+                @Html.Raw(Model.Description)
+                @Model.Description
+            </div>
+        </div>
+    </div>
+    <br />
+    <div id="sliders">
+        <vc:newest-products exclude-id="@Model.Id"></vc:newest-products>
+    </div>
+</div>
