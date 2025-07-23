@@ -6,86 +6,7 @@
 @section Csss {
     <style>
 
-        .content-block {
-            padding: 00px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            margin-top: 10px;
-        }
-
-        /* Styles for the Second carousel */
-        @@media (max-width: 767px) {
-            #recipeCarousel2 .carousel-inner .carousel-item > div {
-                display: none;
-            }
-
-                #recipeCarousel2 .carousel-inner .carousel-item > div:first-child {
-                    display: block;
-                }
-        }
-
-        #recipeCarousel2
-        .carousel-inner .carousel-item.active,
-        .carousel-inner .carousel-item-next,
-        .carousel-inner .carousel-item-prev {
-            display: flex;
-        }
-
-        /* medium and up screens */
-        @@media (min-width: 768px) {
-            #recipeCarousel2 .carousel-inner .carousel-item-end.active, .carousel-inner .carousel-item-next {
-                transform: translateX(25%);
-            }
-
-            #recipeCarousel2
-            .carousel-inner .carousel-item-start.active,
-            .carousel-inner .carousel-item-prev {
-                transform: translateX(-25%);
-            }
-        }
-
-        #recipeCarousel2
-        .carousel-inner .carousel-item-end,
-        .carousel-inner .carousel-item-start {
-            transform: translateX(0);
-        }
-
-        /* Styles for the third carousel */
-        @@media (max-width: 767px) {
-            #recipeCarousel3 .carousel-inner .carousel-item > div {
-                display: none;
-            }
-
-                #recipeCarousel3 .carousel-inner .carousel-item > div:first-child {
-                    display: block;
-                }
-        }
-
-        #recipeCarousel3
-        .carousel-inner .carousel-item.active,
-        .carousel-inner .carousel-item-next,
-        .carousel-inner .carousel-item-prev {
-            display: flex;
-        }
-
-        /* medium and up screens */
-        @@media (min-width: 768px) {
-            #recipeCarousel3 .carousel-inner .carousel-item-end.active, .carousel-inner .carousel-item-next {
-                transform: translateX(25%);
-            }
-
-            #recipeCarousel3
-            .carousel-inner .carousel-item-start.active,
-            .carousel-inner .carousel-item-prev {
-                transform: translateX(-25%);
-            }
-        }
-
-        #recipeCarousel3
-        .carousel-inner .carousel-item-end,
-        .carousel-inner .carousel-item-start {
-            transform: translateX(0);
-        }
+         
     </style>
 }
 
@@ -93,44 +14,7 @@
     <div class="row mt-4">
         <div class="col-lg-8 content-block ms-lg-auto">
             <!-- Right Block Content with Carousel -->
-            <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                </div>
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="~/images/application/piclumen-1732726621345.png" class="d-block w-100" alt="...">
-                        <div class="carousel-caption d-none d-md-block">
-                            <h5>First slide label</h5>
-                            <p>Some representative placeholder content for the first slide.</p>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img src="~/images/application/nocolor.png" class="d-block w-100" alt="...">
-                        <div class="carousel-caption d-none d-md-block">
-                            <h5>First slide label</h5>
-                            <p>Some representative placeholder content for the first slide.</p>
-                        </div>
-                    </div>
-                    <div class="carousel-item">
-                        <img src="~/images/application/piclumen-1732726621345.png" class="d-block w-100" alt="...">
-                        <div class="carousel-caption d-none d-md-block">
-                            <h5>First slide label</h5>
-                            <p>Some representative placeholder content for the first slide.</p>
-                        </div>
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
+            <vc:slider></vc:slider>
         </div>
         <div class="col-lg-3 content-block">
             <!-- Left Block Content -->
@@ -246,39 +130,9 @@
     </div>
 </div>
 
-@section Scripts {
+@section Scripts
+{
     <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script>
-        let items = document.querySelectorAll('#recipeCarousel2 .carousel-item');
-        items.forEach((el) => {
-            const minPerSlide = 4;
-            let next = el.nextElementSibling;
-            for (var i=1; i<minPerSlide; i++) {
-                if (!next) {
-                    // wrap carousel by using first child
-                    next = items[0];
-                }
-                let cloneChild = next.cloneNode(true);
-                el.appendChild(cloneChild.children[0]);
-                next = next.nextElementSibling;
-            }
-        });
-
-        let items3 = document.querySelectorAll('#recipeCarousel3 .carousel-item');
-        items3.forEach((el) => {
-            const minPerSlide = 4;
-            let next3 = el.nextElementSibling;
-            for (var i=1; i<minPerSlide; i++) {
-                if (!next3) {
-                    // wrap carousel by using first child
-                    next3 = items3[0];
-                }
-                let cloneChild3 = next3.cloneNode(true);
-                el.appendChild(cloneChild3.children[0]);
-                next3 = next3.nextElementSibling;
-            }
-        });
-    </script>
 }
 
 

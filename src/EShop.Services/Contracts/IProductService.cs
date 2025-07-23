@@ -15,6 +15,7 @@ namespace EShop.Services.Contracts
         List<ShowProductViewModel> GetProductsPreview();
         Task<ProductDetailsViewModel?> GetProductDetails(int productId);
         Task<List<ProductPreviewViewModel>> GetNewestProductAsync(int? excludeId = null, int take = 8);
+        Task<List<ShowProductInComboBoxViewModel>> GetProductForComboBox();
         int GetMinPrice();
         int GetMaxPrice();
         Task<Product?> GetProductToDelete(int id);

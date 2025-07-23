@@ -341,6 +341,39 @@ namespace EShop.DataLayer.Migrations
                     b.ToTable("ProductProperty");
                 });
 
+            modelBuilder.Entity("EShop.Entities.Slider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FirstTitle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SecondTitle")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Slider");
+                });
+
             modelBuilder.Entity("EShop.Entities.Category", b =>
                 {
                     b.HasOne("EShop.Entities.Category", "Parent")
@@ -439,6 +472,17 @@ namespace EShop.DataLayer.Migrations
                 {
                     b.HasOne("EShop.Entities.Product", "Product")
                         .WithMany("ProductProperties")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("EShop.Entities.Slider", b =>
+                {
+                    b.HasOne("EShop.Entities.Product", "Product")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

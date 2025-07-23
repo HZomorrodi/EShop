@@ -6,25 +6,27 @@
 		<button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
 		<button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
 	</div>
-	@for (int i = 0; i < Model.Count; i++)
-	{
-		<div class="carousel-inner">
-			<div class="carousel-item @(i == 0 ? "active" : "")">
-				<img src="~/images/sliders/@Model[i].Image" class="d-block w-100" alt=@Model[i].FirstTitle height="400">
-				<div class="carousel-caption d-none d-md-block">
-					<h5>@Model[i].FirstTitle</h5>
-					<p>@Model[i].SecondTitle</p>
+@for (int i = 0; i < Model.Count; i++)
+{
+		<a asp-controller="Product" asp-action="Details" asp-route-id="@Model[i].ProductId" asp-route-title="@Model[i].FirstTitle">
+			<div class="carousel-inner">
+				<div class="carousel-item @(i == 0 ? "active" : "")">
+					<img src="~/images/sliders/@Model[i].Image" class="d-block w-100" alt=@Model[i].FirstTitle height="400">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>@Model[i].FirstTitle</h5>
+						<p>@Model[i].SecondTitle</p>
+					</div>
 				</div>
 			</div>
-		</div>
+		</a>
 	}
 
-	<button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-		<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-		<span class="visually-hidden">Previous</span>
-	</button>
-	<button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-		<span class="carousel-control-next-icon" aria-hidden="true"></span>
-		<span class="visually-hidden">Next</span>
-	</button>
-</div>
+			<button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
+	</div>

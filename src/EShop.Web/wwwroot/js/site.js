@@ -3,6 +3,39 @@
 
 // ==================== Quantity Buttons ====================
 
+
+        let items = document.querySelectorAll('#recipeCarousel2 .carousel-item');
+        items.forEach((el) => {
+            const minPerSlide = 4;
+            let next = el.nextElementSibling;
+            for (var i=1; i<minPerSlide; i++) {
+                if (!next) {
+                    // wrap carousel by using first child
+                    next = items[0];
+                }
+                let cloneChild = next.cloneNode(true);
+                el.appendChild(cloneChild.children[0]);
+                next = next.nextElementSibling;
+            }
+        });
+
+        let items3 = document.querySelectorAll('#recipeCarousel3 .carousel-item');
+        items3.forEach((el) => {
+            const minPerSlide = 4;
+            let next3 = el.nextElementSibling;
+            for (var i=1; i<minPerSlide; i++) {
+                if (!next3) {
+                    // wrap carousel by using first child
+                    next3 = items3[0];
+                }
+                let cloneChild3 = next3.cloneNode(true);
+                el.appendChild(cloneChild3.children[0]);
+                next3 = next3.nextElementSibling;
+            }
+        });
+
+// ==================== Quantity Buttons ====================
+
 document.querySelectorAll('.minus-btn').forEach(btn => {
     btn.addEventListener('click', function () {
         let countElement = this.previousElementSibling;
@@ -137,25 +170,4 @@ $("#signup-tab").on("click", function () {
     });
 });
 
-$(document).on('click', '[data-bs-target="#category-children-modal"]', function (event) {
-    event.preventDefault(); // Stop Bootstrap from opening the modal
-    const triggerButton = $(this);
-    const id = triggerButton.data('id');
-    const title = triggerButton.data('title');
-
-    $('#category-children-modal .modal-header span').html(title);
-    $('#category-children-modal img').removeClass('d-none');
-
-    $.ajax({
-        url: '/Admin/Category/ShowCategoryChildren',
-        type: 'GET',
-        data: { mainCatId: id },
-        success: function (data) {
-            $('#category-children-modal .modal-body').html(data);
-            $('#category-children-modal').modal('show'); // Manually open modal
-        },
-        complete: function () {
-            $('#category-children-modal img').addClass('d-none');
-        }
-    });
-});
+ 

@@ -59,14 +59,36 @@
 @section Scripts
 {
     <script>
+         $('[data-bs-target="#category-children-modal"]').on('click', function() {
+                    event.preventDefault(); // Stop Bootstrap from opening the modal
+        const triggerButton = $(this);
+        const id = triggerButton.data('id');
+        const title = triggerButton.data('title');
+
+        $('#category-children-modal .modal-header span').html(title);
+        $('#category-children-modal img').removeClass('d-none');
+
+        $.ajax({
+            url: '/Admin/Category/ShowCategoryChildren',
+            type: 'GET',
+            data: { mainCatId: id },
+            success: function (data) {
+                $('#category-children-modal .modal-body').html(data);
+                $('#category-children-modal').modal('show'); // Manually open modal
+            },
+            complete: function () {
+                $('#category-children-modal img').addClass('d-none');
+            }
+        });
+            });
         function showCategoryChildren(mainCatId, mainCatTitle) {
             // $('#category-children-table').remove();
-            $('#category-children-modal .modal-header span').html(mainCatTitle);
+            $('#category-children-modal .modal-header span').html('maina');
             $('#category-children-modal img').removeClass('d-none');
             var myModal = new bootstrap.Modal(document.getElementById('category-children-modal'));
             myModal.show();
             $.ajax({
-                url: '/Admin/Category/ShowCategoryChildren',
+                url: '/Admin/Category/ShowCategoryChildren1',
                 data: {mainCatId: mainCatId},
                 success: function (data, status) {
                     $('#category-children-modal img').addClass('d-none');

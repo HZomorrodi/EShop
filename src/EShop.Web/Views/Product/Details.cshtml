@@ -1,5 +1,5 @@
 ﻿@using System.Net
-@model EShop.ViewModels.Products.ProductDetailsViewModel
+@model EShop.ViewModels.Products.ProductDetailsViewModel;
 
 @{
     ViewData["Title"] = $"جزییات محصول {Model.Title}";
@@ -11,7 +11,7 @@
             <img id="main-product-image" src="/images/products/@Model.Images.First()" class="img-thumbnail" alt="@Model.Title" style="width: 100%" />
             @foreach (var image in Model.Images)
             {
-                <img src="/images/products/@image" class="img-thumbnail" width="100" style="cursor: pointer" onclick="changeImage(this)" />
+                <img src="/images/products/@image" class="img-thumbnail subImage" width="100" style="cursor: pointer"  />
             }
         </div>
         <div class="col-md-8">
@@ -56,6 +56,16 @@
     </div>
     <br />
     <div id="sliders6">
-        <vc:newest- exclude-id="@Model.Id"></vc:newest- >
+        <vc:newest-products exclude-id="@Model.Id"></vc:newest-products>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+
+    <script>
+        $('.subImage').on('click',function(){
+            $('#main-product-image').attr("src",$(this).attr("src"))
+        })
+    </script>
+}

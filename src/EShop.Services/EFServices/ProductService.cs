@@ -98,5 +98,12 @@ namespace EShop.Services.EFServices
                 .Include(p => p.ProductImages)
                 .SingleOrDefaultAsync();
         }
+
+        public Task<List<ShowProductInComboBoxViewModel>> GetProductForComboBox()
+        => _products.Select(x => new ShowProductInComboBoxViewModel()
+        {
+            Id = x.Id,
+            Title = x.Title
+        }).ToListAsync();
     }
 }
