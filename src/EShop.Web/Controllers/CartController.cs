@@ -8,5 +8,10 @@ namespace EShop.Web.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public JsonResult Add(int id)
+        {
+            return Json(true);
+        }
     }
 }

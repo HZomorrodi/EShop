@@ -31,7 +31,7 @@ namespace EShop.Web.Controllers
         private readonly ISignInManagerService _signInManagerService = signInManagerService;
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> CheckUserName(string userName, int? id)
+        public async Task<JsonResult> CheckUserName(string userName, int? id)
         {
             if (User.Identity?.IsAuthenticated == true && id is not null)
             {
