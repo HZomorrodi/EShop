@@ -13,7 +13,7 @@ namespace EShop.Web.Controllers
         {
             return View();
         }
-
+        //[Route("Product/{Id}/{title}")]
         public async Task<IActionResult> Details(int id, string title)
         {
             if (id < 1)

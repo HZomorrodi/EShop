@@ -30,7 +30,7 @@ namespace EShop.ViewModels.Sliders
         [MaxLength(50, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
         public string SecondTitle { get; set; }
 
-        [Display(Name = "عکس اسلایدر")]
+        [Display(Name = "عکسس اسلایدر")]
         public IFormFile Image { get; set; }
     }
 }

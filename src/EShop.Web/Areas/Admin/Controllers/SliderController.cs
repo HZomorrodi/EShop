@@ -77,7 +77,7 @@ namespace EShop.Web.Areas.Admin.Controllers
             slider.FirstTitle = model.FirstTitle;
             slider.SecondTitle = model.SecondTitle;
             slider.ProductId = model.ProductId;
-            if (model.Image != null && model.Image.Length > 0)
+            if (model.Image?.Length > 0)
             {
                 WorkWithImages.RemoveImage(slider.Image, "sliders");
                 var imageExtension = Path.GetExtension(model.Image.FileName);

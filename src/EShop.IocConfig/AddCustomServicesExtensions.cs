@@ -57,6 +57,8 @@ namespace EShop.IocConfig
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProductImageService, ProductImageService>();
             services.AddScoped<ISliderService, SliderService>();
+            services.AddScoped<ICartService, CartService>();    
+            services.AddScoped<ICartDetailService, CartDetailService>();    
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
 
