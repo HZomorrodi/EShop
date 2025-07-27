@@ -38,7 +38,7 @@
 			</h2>
 			<br />
 			<form method="post">
-				<button type="submit" id="add-to-cart-button" class="btn btn-outline-success btn-lg mb-3">
+				<button type="button" id="add-to-cart-button" class="btn btn-outline-success btn-lg mb-3">
 					<i class="bi bi-cart-check-fill"></i>
 					<span>افزودن به سبد خرید</span>
 					<img class="d-none" width="20" src="/images/application/loading.gif" alt="صبر کنید" />
@@ -63,19 +63,32 @@
 		$('.subImage').on('click',function(){
 			$('#main-product-image').attr("src",$(this).attr("src"))
 		})
-		$('#add-to-cart-button').on('click',function(){
-		   $.ajax({
-			url: '/Cart/Add',
-			type: 'POST',
-			data: { id: @Model.Id },
-			success: function (data) {
-				$('#category-children-modal .modal-body').html(data);
-				$('#category-children-modal').modal('show'); // Manually open modal
-			},
-			complete: function () {
-				$('#category-children-modal img').addClass('d-none');
-			}
+				$('#add-to-cart-button').on('click', function() {
+			$.ajax({
+				url: '/Cart/Add',
+				type: 'POST',
+				data: {
+					productId: @Model.Id,
+					__RequestVerificationToken: $('form input[name="__RequestVerificationToken"]').val()
+				},
+				beforeSend: function() {
+					$('#add-to-cart-button span').text('در حال افزودن...');
+					$('#add-to-cart-button img').removeClass('d-none');
+					$('#add-to-cart-button').prop('disabled', true); // Prevent double clicks
+				},
+				success: function(data) {
+					$('#category-children-modal .modal-body').html(data);
+					$('#category-children-modal').modal('show');
+				},
+				error: function(xhr, status, error) {
+					alert("خطا در افزودن به سبد خرید: " + error);
+				},
+				complete: function() {
+					$('#add-to-cart-button span').text('افزودن به سبد خرید');
+					$('#add-to-cart-button img').addClass('d-none');
+					$('#add-to-cart-button').prop('disabled', false); // Re-enable button
+				}
+			});
 		});
-		})
 	</script>
 }

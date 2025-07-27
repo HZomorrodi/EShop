@@ -16,6 +16,11 @@ namespace EShop.Common.Extensions
             ClaimsIdentity? claimsIdentity = identity as ClaimsIdentity;
             return claimsIdentity.FindFirstValue(IdentityClaimNames.FullName);
         }
+        public static int GetUserId(this IIdentity? identity)
+        {
+            ClaimsIdentity? claimsIdentity = identity as ClaimsIdentity;
+            return int.Parse(claimsIdentity.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
 
         private static string? FindFirstValue(this ClaimsIdentity? claimsIdentity, string type)
         {

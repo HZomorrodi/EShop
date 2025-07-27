@@ -16,7 +16,7 @@ namespace EShop.Entities
         #endregion
         #region Relations
         public virtual User User { get; set; }
-        public virtual ICollection<CartDetail> CartDetails { get; set; }
+        public virtual ICollection<CartDetail> CartDetails { get; set; } = [];
         #endregion
     }
 }
