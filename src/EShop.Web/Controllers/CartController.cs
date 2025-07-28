@@ -30,10 +30,15 @@ namespace EShop.Web.Controllers
                 return BadRequest();
             int userId = User.Identity.GetUserId();
             Cart? userCart = await _cartService.GetUserCartAsync(userId);
-            userCart ??= new()
+            if (userCart is null)
             {
-                UserId = userId,
-            };
+                userCart = new() 
+                { 
+                    UserId = userId 
+                };
+                await _cartService.AddAsync(userCart);
+            }
+
             CartDetail? cartDetail = await _cartDetailService.GetCartDetailsBy(productId, userId);
             if (cartDetail is null)
             {
@@ -49,7 +54,6 @@ namespace EShop.Web.Controllers
                 cartDetail.Count++;
             }
             userCart.TotalPrice += product.Price;
-            await _cartService.AddAsync(userCart);
             await _uow.SaveChangesAsync();
             return Json(userCart.TotalPrice.ToString("#,0"));
         }

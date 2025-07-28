@@ -54,6 +54,15 @@
 	<div>
 		<vc:newest-products exclude-id="@Model.Id"></vc:newest-products>
 	</div>
+	<div class="toast-container position-fixed bottom-0 start-0 p-3">
+		<div id="myToastEl" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header">
+				<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body"></div>
+
+		</div>
+	</div>
 </div>
 
 @section Scripts {
@@ -77,11 +86,11 @@
 					$('#add-to-cart-button').prop('disabled', true); // Prevent double clicks
 				},
 				success: function(data) {
-					$('#category-children-modal .modal-body').html(data);
-					$('#category-children-modal').modal('show');
+						showToast('محصول مورد نظر با موفقیت به سبد خرید اضافه شد','bg-success');
+					$('[data-bs-target="#offcanvasCart"] span').eq(1).text(`(${data})`)
 				},
 				error: function(xhr, status, error) {
-					alert("خطا در افزودن به سبد خرید: " + error);
+							showToast("خطا در افزودن به سبد خرید: " + error,'bg-danger');
 				},
 				complete: function() {
 					$('#add-to-cart-button span').text('افزودن به سبد خرید');
@@ -90,5 +99,12 @@
 				}
 			});
 		});
+
+	function showToast(message,bgClass) {
+			const toast = $('#myToastEl');
+			toast.addClass(bgClass);
+			toast.find('.toast-body').text(message);
+			bootstrap.Toast.getOrCreateInstance(toast).show();
+		}
 	</script>
 }
