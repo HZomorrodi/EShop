@@ -11,5 +11,8 @@ namespace EShop.ViewModels.Cart
         public int Id { get; set; }
         public int TotalPrice { get; set; }
         public bool IsPay { get; set; }
+        public int RefId { get; set; }
+        public string Address { get; set; }
+
     }
 }
