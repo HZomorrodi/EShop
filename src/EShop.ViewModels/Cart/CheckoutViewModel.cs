@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace EShop.ViewModels.Cart
 {
-    public class ShowCartDetailsViewModel
+    public class CheckoutViewModel
     {
-        public List<CartDetailPreviewViewModel> CartDetails { get; set; }
         public int UserCartTotalPrice { get; set; }
+        public string Address { get; set; }
     }
 }

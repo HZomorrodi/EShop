@@ -88,6 +88,7 @@
 				success: function(data) {
 						showToast('محصول مورد نظر با موفقیت به سبد خرید اضافه شد','bg-success');
 					$('[data-bs-target="#offcanvasCart"] span').eq(1).text(`(${data})`)
+					reloadOffCanvas();
 				},
 				error: function(xhr, status, error) {
 							showToast("خطا در افزودن به سبد خرید: " + error,'bg-danger');

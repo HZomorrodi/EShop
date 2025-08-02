@@ -170,4 +170,16 @@ $("#signup-tab").on("click", function () {
     });
 });
 
+$("#offcanvasCart").on("show.bs.offcanvas", reloadOffCanvas)
+
+function  reloadOffCanvas()
+{
+    $.ajax({
+        url: '/Cart/ShowCartDetailsPreview',
+        type: 'GET',
+        success: function (cartsData) {
+            $('#offcanvasCart .offcanvas-body').html(cartsData)
+        }
+    });
+}
  

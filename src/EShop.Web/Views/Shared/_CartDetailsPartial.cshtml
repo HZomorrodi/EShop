@@ -1,0 +1,42 @@
+﻿@using EShop.ViewModels.Cart
+@model ShowCartDetailsViewModel;
+@{
+    ViewData["Title"] = "_CartDetailsPartial";
+}
+
+<p class="text-center fs-3">جمع کل سبد خرید</p>
+<div class="d-flex justify-content-around align-items-center mb-3">
+    <h3 class=" ">@Model.UserCartTotalPrice.ToString("N0") تومان</h3>
+    <a asp-action="Checkout" asp-controller="Cart" class="btn btn-success">
+        تسویه حساب
+        <i class="bi bi-basket3-fill"></i>
+    </a>
+</div>
+<div class="row">
+
+    @foreach (var item in Model.CartDetails)
+    {
+        <div class="col-6 mb-3">
+            <div class="card">
+                <img src="~/images/products/@item.ProductImage" class="card-img-top" alt="@item.ProductTitle">
+                <div class="card-body">
+                    <h5 class="card-title">@item.ProductTitle</h5>
+                    <div class="d-flex justify-content-center align-items-center">
+                        <button class="btn btn-outline-secondary btn-sm plus-btn">+</button>
+                        <span class="count mx-3 bg-secondary py-1 px-3 rounded ">@item.Count</span>
+                        <button class="btn btn-outline-secondary btn-sm minus-btn">-</button>
+                    </div>
+                    <div class="mt-2 text-center">
+                        <p>قیمت واحد</p>
+                        <p>@item.Price</p>
+                        <hr>
+                        <p>قیمت کل</p>
+                        <p class="total-price">@item.TotalPrice.ToString("N0")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
