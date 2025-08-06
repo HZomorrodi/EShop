@@ -69,10 +69,13 @@
 	<script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 
 	<script>
-		$('.subImage').on('click',function(){
-			$('#main-product-image').attr("src",$(this).attr("src"))
-		})
-				$('#add-to-cart-button').on('click', function() {
+		// Handle sub-image click to change main product image
+		$('.subImage').on('click', function() {
+			$('#main-product-image').attr("src", $(this).attr("src"));
+		});
+
+		// Handle add to cart button click
+		$('#add-to-cart-button').on('click', function() {
 			$.ajax({
 				url: '/Cart/Add',
 				type: 'POST',
@@ -81,17 +84,22 @@
 					__RequestVerificationToken: $('form input[name="__RequestVerificationToken"]').val()
 				},
 				beforeSend: function() {
+					if (!isUserAuthenticated) {
+						showToast('ابتدا وارد سایت شوید', 'bg-danger');
+						return false;
+					}
+
 					$('#add-to-cart-button span').text('در حال افزودن...');
 					$('#add-to-cart-button img').removeClass('d-none');
 					$('#add-to-cart-button').prop('disabled', true); // Prevent double clicks
 				},
 				success: function(data) {
-						showToast('محصول مورد نظر با موفقیت به سبد خرید اضافه شد','bg-success');
-					$('[data-bs-target="#offcanvasCart"] span').eq(1).text(`(${data})`)
-					reloadOffCanvas();
+					showToast('محصول مورد نظر با موفقیت به سبد خرید اضافه شد', 'bg-success');
+					$('[data-bs-target="#offcanvasCart"] span').eq(1).text(`(${data})`);
+					getCardDetails();
 				},
 				error: function(xhr, status, error) {
-							showToast("خطا در افزودن به سبد خرید: " + error,'bg-danger');
+					showToast("خطا در افزودن به سبد خرید: " + error, 'bg-danger');
 				},
 				complete: function() {
 					$('#add-to-cart-button span').text('افزودن به سبد خرید');
@@ -101,7 +109,8 @@
 			});
 		});
 
-	function showToast(message,bgClass) {
+		// Show toast notification
+		function showToast(message, bgClass) {
 			const toast = $('#myToastEl');
 			toast.addClass(bgClass);
 			toast.find('.toast-body').text(message);

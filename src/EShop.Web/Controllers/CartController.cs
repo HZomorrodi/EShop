@@ -9,12 +9,14 @@ using EShop.Services.EFServices;
 using EShop.ViewModels.Cart;
 using EShop.Web.ViewComponents;
 using MailKit.Search;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using ZarinPal.Class;
 
 namespace EShop.Web.Controllers
 {
+    [Authorize]
     public class CartController : Controller
     {
         private readonly ICartService _cartService;
@@ -32,7 +34,7 @@ namespace EShop.Web.Controllers
             _cartService = cartService;
             _cartDetailService = cartDetailService;
             _productService = productService;
-            
+
             _uow = uow;
         }
 
@@ -151,6 +153,45 @@ namespace EShop.Web.Controllers
             return Json(userCart.TotalPrice.ToString("#,0"));
         }
 
+        public async Task<IActionResult> IncreaseOrLowOffAsync(int productId, bool isIncrease, bool removeAll)
+        {
+            var product = await _productService.FindByIdAsync(productId);
+            if (product is null)
+                return BadRequest();
+            var userId = User.Identity.GetUserId();
+            var cartDetail = await _cartDetailService.GetCartDetailsBy(productId, userId);
+            if (cartDetail is null)
+                return BadRequest();
+            if (removeAll)
+            {
+                _cartDetailService.Remove(cartDetail);
+            }
+            else if (isIncrease)
+            {
+                cartDetail.Count++;
+            }
+            else
+            {
+                if (cartDetail.Count <= 1)
+                    _cartDetailService.Remove(cartDetail);
+                else
+                    cartDetail.Count--;
+            }
+            var userCart = await _cartService.GetUserCartAsync(userId);
+            if (isIncrease)
+            {
+                userCart.TotalPrice = await _cartDetailService.CalculateUserCartTotalPriceAsync(userId)
+                    + product.Price;
+            }
+            else
+            {
+                userCart.TotalPrice = await _cartDetailService.CalculateUserCartTotalPriceAsync(userId)
+                                      - product.Price * (removeAll ? cartDetail.Count : 1);
+            }
+            await _uow.SaveChangesAsync();
+            return Ok();
+        }
+
         public async Task<string> GetUserCartTotalPrice()
         {
             int userId = User.Identity.GetUserId();
@@ -161,7 +202,7 @@ namespace EShop.Web.Controllers
         {
             int userId = User.Identity.GetUserId();
             List<CartDetailPreviewViewModel> cartDetails = await _cartDetailService.GetCartDetailsByAsync(userId);
-            int userCartTotalPrice = cartDetails.Sum(c => c.Price * c.Count); 
+            int userCartTotalPrice = cartDetails.Sum(c => c.Price * c.Count);
             ShowCartDetailsViewModel model = new()
             {
                 CartDetails = cartDetails,

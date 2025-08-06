@@ -4,66 +4,87 @@
 // ==================== Quantity Buttons ====================
 
 
-        let items = document.querySelectorAll('#recipeCarousel2 .carousel-item');
-        items.forEach((el) => {
-            const minPerSlide = 4;
-            let next = el.nextElementSibling;
-            for (var i=1; i<minPerSlide; i++) {
-                if (!next) {
-                    // wrap carousel by using first child
-                    next = items[0];
-                }
-                let cloneChild = next.cloneNode(true);
-                el.appendChild(cloneChild.children[0]);
-                next = next.nextElementSibling;
-            }
-        });
+let items = document.querySelectorAll('#recipeCarousel2 .carousel-item');
+items.forEach((el) => {
+    const minPerSlide = 4;
+    let next = el.nextElementSibling;
+    for (var i = 1; i < minPerSlide; i++) {
+        if (!next) {
+            // wrap carousel by using first child
+            next = items[0];
+        }
+        let cloneChild = next.cloneNode(true);
+        el.appendChild(cloneChild.children[0]);
+        next = next.nextElementSibling;
+    }
+});
 
-        let items3 = document.querySelectorAll('#recipeCarousel3 .carousel-item');
-        items3.forEach((el) => {
-            const minPerSlide = 4;
-            let next3 = el.nextElementSibling;
-            for (var i=1; i<minPerSlide; i++) {
-                if (!next3) {
-                    // wrap carousel by using first child
-                    next3 = items3[0];
-                }
-                let cloneChild3 = next3.cloneNode(true);
-                el.appendChild(cloneChild3.children[0]);
-                next3 = next3.nextElementSibling;
-            }
-        });
+let items3 = document.querySelectorAll('#recipeCarousel3 .carousel-item');
+items3.forEach((el) => {
+    const minPerSlide = 4;
+    let next3 = el.nextElementSibling;
+    for (var i = 1; i < minPerSlide; i++) {
+        if (!next3) {
+            // wrap carousel by using first child
+            next3 = items3[0];
+        }
+        let cloneChild3 = next3.cloneNode(true);
+        el.appendChild(cloneChild3.children[0]);
+        next3 = next3.nextElementSibling;
+    }
+});
 
 // ==================== Quantity Buttons ====================
 
-document.querySelectorAll('.minus-btn').forEach(btn => {
-    btn.addEventListener('click', function () {
-        let countElement = this.previousElementSibling;
-        let count = parseInt(countElement.textContent);
-        if (count > 1) {
-            count--;
-            countElement.textContent = count;
-            updateTotalPrice(this, count);
-        }
-    });
-});
+//document.querySelectorAll('.minus-btn').forEach(btn => {
+//    btn.addEventListener('click', function () {
+//        let countElement = this.previousElementSibling;
+//        let count = parseInt(countElement.textContent);
+//        if (count > 1) {
+//            count--;
+//            countElement.textContent = count;
+//            updateTotalPrice(this, count);
+//        }
+//    });
+//});
 
-document.querySelectorAll('.plus-btn').forEach(btn => {
-    btn.addEventListener('click', function () {
-        let countElement = this.nextElementSibling;
-        let count = parseInt(countElement.textContent);
-        count++;
-        countElement.textContent = count;
-        updateTotalPrice(this, count);
-    });
-});
+//document.querySelectorAll('.plus-btn').forEach(btn => {
+//    console.log("adama8")
+//    btn.addEventListener('click', function () {
+//        let countElement = this.nextElementSibling;
+//        let count = parseInt(countElement.textContent);
+//        count++;
+//        countElement.textContent = count;
+//        updateTotalPrice(this, count);
+//    });
+//});
 
-function updateTotalPrice(btn, count) {
-    let unitPrice = 100; // Example unit price
-    let totalPriceElement = btn.closest('.card-body').querySelector('.total-price');
-    totalPriceElement.textContent = (unitPrice * count) + ' هزار تومان';
+//function updateTotalPrice(btn, count) {
+//    let unitPrice = 100; // Example unit price
+//    let totalPriceElement = btn.closest('.card-body').querySelector('.total-price');
+//    totalPriceElement.textContent = (unitPrice * count) + ' هزار تومان';
+//}
+$('.offcanvas-body').on("click", '.plus-btn', function () {
+    const card = $(this).closest('.card')
+    const productId = card.data('product-id')
+    increaseOrLowOffCartDetail(productId, true, card)
+})
+
+$('.offcanvas-body').on("click", '.minus-btn', function () {
+    const card = $(this).closest('.card')
+    const productId = card.data('product-id')
+    increaseOrLowOffCartDetail(productId, false, card)
+})
+
+$('.offcanvas-body').on("click", '.remove-btn', function () {
+    const card = $(this).closest('.card')
+    const productId = card.data('product-id')
+    increaseOrLowOffCartDetail(productId, false, card, true)
+})
+
+function increaseOrLowOffCartDetail(productId, isIncrease, el, removeAll = false) {
+    console.log(removeAll)
 }
-
 // ==================== Register Form ====================
 
 function onBeginRegister() {
@@ -169,17 +190,33 @@ $("#signup-tab").on("click", function () {
         }
     });
 });
-
-$("#offcanvasCart").on("show.bs.offcanvas", reloadOffCanvas)
-
-function  reloadOffCanvas()
-{
+function reloadTotalPriceInNavbar() {
+    $('[data-bs-target="#offcanvasCart"] span').eq(1).text('لطفا صبر کنید ...')
     $.ajax({
-        url: '/Cart/ShowCartDetailsPreview',
+        url: '/Cart/GetUserCartTotalPrice',
         type: 'GET',
-        success: function (cartsData) {
-            $('#offcanvasCart .offcanvas-body').html(cartsData)
+        success: function (data) {
+            $('[data-bs-target="#offcanvasCart"] span').eq(1).text(`(${data})`)
         }
     });
 }
- 
+if (isUserAuthenticated) {
+    reloadTotalPriceInNavbar()
+}
+
+$("#offcanvasCart").on("show.bs.offcanvas", getCardDetails)
+
+function getCardDetails() {
+    if (isUserAuthenticated) {
+        $('#cart-details-loading').removeClass('d-none');
+        $.ajax({
+            url: '/Cart/ShowCartDetailsPreview',
+            type: 'GET',
+            success: function (cartsData) {
+                $('#cart-details-loading').addClass('d-none');
+                $('#offcanvasCart .offcanvas-body').html(cartsData)
+            }
+        });
+    }
+}
+
