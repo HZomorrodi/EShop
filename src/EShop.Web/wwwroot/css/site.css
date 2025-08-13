@@ -150,4 +150,9 @@ body {
 .carousel-inner .carousel-item-start {
     transform: translateX(0);
 }
+.show-extra-text-in-3-dots {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
  

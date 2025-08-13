@@ -152,7 +152,7 @@ namespace EShop.Web.Controllers
             await _uow.SaveChangesAsync();
             return Json(userCart.TotalPrice.ToString("#,0"));
         }
-
+        [HttpPost]
         public async Task<IActionResult> IncreaseOrLowOffAsync(int productId, bool isIncrease, bool removeAll)
         {
             var product = await _productService.FindByIdAsync(productId);

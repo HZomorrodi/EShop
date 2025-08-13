@@ -6,7 +6,7 @@
 
 <p class="text-center fs-3">جمع کل سبد خرید</p>
 <div class="d-flex justify-content-around align-items-center mb-3">
-	<h3 class=" ">@Model.UserCartTotalPrice.ToString("N0") تومان</h3>
+	<h3 id="cart-total-price">@Model.UserCartTotalPrice.ToString("N0") تومان</h3>
 	<a asp-action="Checkout" asp-controller="Cart" class="btn btn-success">
 		تسویه حساب
 		<i class="bi bi-basket3-fill"></i>
@@ -20,7 +20,7 @@
 			<div class="card" data-product-id="@item.ProductId">
 				<img src="~/images/products/@item.ProductImage" class="card-img-top" alt="@item.ProductTitle">
 				<div class="card-body">
-					<h5 class="card-title">@item.ProductTitle</h5>
+					<h5 class="card-title show-extra-text-in-3-dots">@item.ProductTitle</h5>
 					<div class="d-flex justify-content-center align-items-center">
 						<button class="btn btn-outline-secondary btn-sm plus-btn">+</button>
 						<span class="count mx-3 bg-secondary py-1 px-3 rounded ">@item.Count</span>
@@ -31,7 +31,7 @@
 					</div>
 					<div class="mt-2 text-center">
 						<p>قیمت واحد</p>
-						<p>@item.Price</p>
+						<p>@item.Price.ToString("N0")</p>
 						<hr>
 						<p>قیمت کل</p>
 						<p class="total-price">@item.TotalPrice.ToString("N0")</p>

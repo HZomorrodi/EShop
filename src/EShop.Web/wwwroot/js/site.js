@@ -82,8 +82,57 @@ $('.offcanvas-body').on("click", '.remove-btn', function () {
     increaseOrLowOffCartDetail(productId, false, card, true)
 })
 
-function increaseOrLowOffCartDetail(productId, isIncrease, el, removeAll = false) {
-    console.log(removeAll)
+function increaseOrLowOffCartDetail(productId, isIncrease, card, removeAll = false) {
+    $.ajax({
+        url: '/Cart/ ',
+        type: 'POST',
+        data: {
+            productId, isIncrease, removeAll
+        },
+        beforeSend: function () {
+            $('.plus-btn, .minus-btn, .remove-btn').prop('disabled', true);
+        },
+        success: function () {
+            if (false) {
+                reloadTotalPriceInNavbar();
+                getCardDetails();
+            }
+            else {
+                const countOfCartDetail = parseInt($(card).find('.count').text());
+                const uniquePriceOfCartDetail = parseInt($(card).find('div:eq(3) p:eq(1)')
+                    .text().replace(/,/g, ''), 10);
+                if ((countOfCartDetail === 1 && !isIncrease) || removeAll) {
+                    $(card).remove();
+                }
+                else {
+                    const newCount = isIncrease ? countOfCartDetail + 1 : countOfCartDetail - 1;
+                    $(card).find('.count').text(newCount);
+                    const newPrice = uniquePriceOfCartDetail * newCount;
+                    $(card).find('div:eq(3) p:eq(3)').text(newPrice.toLocaleString('en-US'));
+                }
+                const cartTotalPrice = parseInt($('#cart-total-price')
+                    .text().replace(/,/g, ''), 10);
+                let newCartTotalPrice;
+                if (isIncrease) {
+                    newCartTotalPrice = (cartTotalPrice + uniquePriceOfCartDetail);
+                }
+                else if (removeAll) {
+                    newCartTotalPrice = (cartTotalPrice - (uniquePriceOfCartDetail * countOfCartDetail));
+                }
+                else {
+                    newCartTotalPrice = (cartTotalPrice - uniquePriceOfCartDetail);
+                }
+                $('#cart-total-price').text(`${newCartTotalPrice.toLocaleString('en-US')} تومان`);
+                $('[data-bs-target="#offcanvasCart"] span').eq(1).text(`(${newCartTotalPrice.toLocaleString('en-US') })`)  
+            }
+        },
+        error: function (xhr, status, error) {
+
+        },
+        complete: function () {
+            $('.plus-btn, .minus-btn, .remove-btn').prop('disabled', false);
+        }
+    });
 }
 // ==================== Register Form ====================
 
