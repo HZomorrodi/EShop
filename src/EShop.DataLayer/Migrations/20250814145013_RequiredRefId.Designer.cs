@@ -4,6 +4,7 @@ using EShop.DataLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.DataLayer.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    partial class EShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250814145013_RequiredRefId")]
+    partial class RequiredRefId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,11 +172,6 @@ namespace EShop.DataLayer.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
-
-                    b.Property<string>("Avatar")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()

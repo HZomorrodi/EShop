@@ -6,11 +6,18 @@ using EShop.Entities;
 using EShop.Entities.Identity;
 using EShop.Services.Contracts;
 using EShop.Services.EFServices;
+using EShop.ViewModels.Application;
 using EShop.ViewModels.Cart;
 using EShop.Web.ViewComponents;
 using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Stripe;
+using Stripe.Checkout;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using ZarinPal.Class;
 
@@ -25,23 +32,27 @@ namespace EShop.Web.Controllers
         private readonly Payment _payment;
         private readonly Authority _authority;
         private readonly IUnitOfWork _uow;
-
+        private readonly IHttpClientFactory _httpClientFactory;
+        private const string MerchantId = "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"; // Sandbox key
         public CartController(ICartService cartService,
                                     ICartDetailService cartDetailService,
                                     IProductService productService,
+                                    IHttpClientFactory httpClientFactory,
+                                    IOptionsMonitor<StripeConfigsModel> optionsSnapshot,
                                     IUnitOfWork uow)
         {
             _cartService = cartService;
             _cartDetailService = cartDetailService;
             _productService = productService;
-
+            var expose = new Expose();
+            _payment = expose.CreatePayment();
+            _authority = expose.CreateAuthority();
+            _httpClientFactory = httpClientFactory;
+            StripeConfiguration.ApiKey = optionsSnapshot.CurrentValue.SecretKey;
             _uow = uow;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+
         public async Task<IActionResult> Checkout()
         {
             int userId = User.Identity.GetUserId();
@@ -65,62 +76,167 @@ namespace EShop.Web.Controllers
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             userCart.Address = model.Address;
             await _uow.SaveChangesAsync();
-            Dto.Response.Payment.Request result = await _payment.Request(new DtoRequest()
+            #region ZarinPal
+            //var client = _httpClientFactory.CreateClient();
+
+            //var requestData = new
+            //{
+            //    merchant_id = MerchantId,
+            //    amount = userCart.TotalPrice + 15000, // 100,000 IRR
+            //    description = "توضیحات سفارش",
+            //    callback_url = Url.Action("PaymentResult", "Cart", new { area = "", orderId = userCart.Id }, protocol: Request.Scheme),
+            //    email = "test@example.com",
+            //    mobile = "09123456789"
+            //};
+
+            //string json = JsonConvert.SerializeObject(requestData);
+            //StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            //HttpResponseMessage response = await client.PostAsync("https://sandbox.zarinpal.com/pg/v4/payment/request.json", content);
+            //string responseJson = await response.Content.ReadAsStringAsync();
+
+            //dynamic result = JsonConvert.DeserializeObject(responseJson);
+
+            //if (result.data != null && result.data.code == 100)
+            //{
+            //    string authority = result.data.authority;
+            //    return Redirect($"https://sandbox.zarinpal.com/pg/StartPay/{authority}");
+            //}
+            //else
+            //{
+            //    return Content("Error: " + responseJson);
+            //}
+            #endregion
+            var domain = $"{Request.Scheme}://{Request.Host}";
+            var options = new SessionCreateOptions
             {
-                Mobile = "09111111182",
-                Description = "Description",
-                Email = "Khi@gmail.com",
-                MerchantId = "er",
-                Amount = userCart.TotalPrice + 15000,
-                CallbackUrl = Url.Action(nameof(PaymentResult), "Cart", new { area = "", orderId = userCart.Id }, protocol: Request.Scheme),
-            }
-            , Payment.Mode.sandbox);
-            if (result.Status == 100)
-            {
-                return Redirect($"https://sandbox.zarinpal.com/pg/StartPay/{result.Authority}");
-            }
-            return View("Error2");
+                PaymentMethodTypes = ["card"],
+                LineItems =
+            [
+                new()
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        UnitAmount = userCart.TotalPrice + 15000, // 20.00 USD
+                        Currency = "usd",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = "Test Product"
+                        }
+                    },
+                    Quantity = 1
+                }
+            ],
+                Mode = "payment",
+                SuccessUrl = $"{domain}/Cart/PaymentResult?session_id={{CHECKOUT_SESSION_ID}}&orderId={userCart.Id}",
+                CancelUrl = domain + "/Cart/Cancel"
+            };
+
+            var service = new SessionService();
+            Session session = service.Create(options);
+
+            return Redirect(session.Url);
         }
 
-        public async Task<IActionResult> PaymentResult(int orderId, string status, string authority)
+        public async Task<IActionResult> PaymentResult(int orderId, string status, string authority, string session_id)
         {
-            if (string.IsNullOrWhiteSpace(status) || string.IsNullOrWhiteSpace(authority))
+            //if (string.IsNullOrWhiteSpace(status) || string.IsNullOrWhiteSpace(authority))
+            //    return View("Error2");
+            if (string.IsNullOrWhiteSpace(session_id))
                 return View("Error2");
+            
             PaymentResultViewModel model = new();
-            if (string.Equals(status, "OK", StringComparison.OrdinalIgnoreCase))
+
+            var sessionService = new SessionService();
+            var session = sessionService.Get(session_id);
+
+            // PaymentIntent ID
+            string paymentIntentId = session.PaymentIntentId;
+
+            // Get PaymentIntent details
+            var paymentIntentService = new PaymentIntentService();
+            var paymentIntent = paymentIntentService.Get(paymentIntentId);
+            
+            // Get Charge ID (if exists)
+            //var chargeId = paymentIntent.Charges.Data.FirstOrDefault()?.Id;
+
+            if (session.PaymentStatus == "paid")
             {
                 Cart? userCart = await _cartService.FindByIdAsync(orderId);
+
                 if (userCart == null)
                     return View("Error2");
-                Dto.Response.Payment.Verification verification = await _payment.Verification(new DtoVerification()
-                {
-                    Amount = userCart.TotalPrice + 15000,
-                    MerchantId = "er",
-                    Authority = authority,
-                }
-                , Payment.Mode.sandbox);
-                model.IsPay = verification.Status == 100;
-                if (verification.Status == 100)
-                {
-                    model.TotalPrice = (userCart.TotalPrice + 15000).ToString("#,0");
-                    model.RefId = verification.RefId;
-                    userCart.IsPay = true;
-                    userCart.RefId = verification.RefId;
-                    await _uow.SaveChangesAsync();
-                }
-                else if (verification.Status == 101)
-                {
-                    ViewBag.Message = "این صورتحساب قبلا تایید شده است.";
-                }
-
+                model.IsPay = true;
+                model.TotalPrice = (userCart.TotalPrice + 15000).ToString("N0");
+                model.RefId = paymentIntentId;
+                userCart.IsPay = true;
+                userCart.RefId = paymentIntentId;
+                await _uow.SaveChangesAsync();
             }
+            else
+            {
+                model.IsPay = false;
+            }
+            #region ZarinPal
+            //if (string.Equals(status, "OK", StringComparison.OrdinalIgnoreCase))
+            //{
+            //    Cart? userCart = await _cartService.FindByIdAsync(orderId);
+            //    if (userCart == null)
+            //        return View("Error2");
+            //    var client = _httpClientFactory.CreateClient();
+
+            //    var verifyData = new
+            //    {
+            //        merchant_id = MerchantId,
+            //        amount = 100000, // must match the request
+            //        authority = authority
+            //    };
+
+            //    var json = JsonConvert.SerializeObject(verifyData);
+            //    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            //    var response = await client.PostAsync("https://sandbox.zarinpal.com/pg/v4/payment/verify.json", content);
+            //    var responseJson = await response.Content.ReadAsStringAsync();
+
+            //    dynamic result = JsonConvert.DeserializeObject(responseJson);
+
+            //    if (result.data != null && result.data.code == 100)
+            //    {
+            //        model.IsPay = true;
+            //        //return Content($"✅ Payment successful! RefID: {result.data.ref_id}");
+            //    }
+            //    else
+            //    {
+            //        model.IsPay = false;
+            //        //return Content("❌ Payment failed: " + responseJson);
+            //    }
+            //    //model.IsPay = verification.Status == 100;
+            //    if (model.IsPay)
+            //    {
+            //        model.TotalPrice = (userCart.TotalPrice + 15000).ToString("#,0");
+            //        model.RefId = result.data.ref_id;
+            //        userCart.IsPay = true;
+            //        userCart.RefId = result.data.ref_id;
+            //        await _uow.SaveChangesAsync();
+            //    }
+            //    //else if (result?.data.code == 101)
+            //    //{
+            //    //    ViewBag.Message = "این صورتحساب قبلا تایید شده است.";
+            //    //}
+
+            //}
+            #endregion
             return View(model);
+        }
+        public IActionResult Cancel()
+        {
+            return Content("Payment was canceled.");
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(int productId)
         {
-            Product product = await _productService.FindByIdAsync(productId);
+            Entities.Product product = await _productService.FindByIdAsync(productId);
             if (product == null)
                 return BadRequest();
             int userId = User.Identity.GetUserId();

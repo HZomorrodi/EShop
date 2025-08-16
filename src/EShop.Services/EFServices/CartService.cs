@@ -29,6 +29,8 @@ namespace EShop.Services.EFServices
                 Id = c.Id,
                 IsPay = c.IsPay,
                 TotalPrice = c.TotalPrice,
+                Address = c.Address,
+                RefId = c.RefId,
             }).ToListAsync();
         }
 
@@ -40,6 +42,8 @@ namespace EShop.Services.EFServices
                 CustomerFullName = c.User.FullName,
                 IsPay = c.IsPay,
                 TotalPrice = c.TotalPrice,
+                RefId = c.RefId,
+                Address = c.Address,
             }).ToListAsync();
         }
     }

@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.Configure<ConnectionStringsModel>(builder.Configuration.GetSection("ConnectionStrings"));
 builder.Services.Configure<EmailConfigsModel>(builder.Configuration.GetSection("EmailConfigs"));
+builder.Services.Configure<StripeConfigsModel>(builder.Configuration.GetSection("Stripe"));
 builder.Services.AddCustomServices();
 
 builder.Services.AddControllersWithViews();

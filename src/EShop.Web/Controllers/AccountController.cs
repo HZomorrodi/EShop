@@ -1,4 +1,5 @@
 ﻿using EShop.Common.Constants;
+using EShop.Common.Extensions;
 using EShop.Common.Mvc;
 using EShop.Entities.Identity;
 using EShop.Services.Contracts;
@@ -72,6 +73,7 @@ namespace EShop.Web.Controllers
                 Email = model.Email,
                 CreatedDateTime = DateTime.Now,
                 IsActive = true,
+                Avatar = PublicConstantStrings.UserDefaultAvatar,
             };
             IdentityResult result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
@@ -373,7 +375,14 @@ namespace EShop.Web.Controllers
                 {
                     user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, model.Password);
                 }
-                IdentityResult result = await _userManager.UpdateAsync(user);
+                if (model.Avatar?.Length > 0)
+                {
+                    string avatarName = Guid.NewGuid().ToString("N");
+                    string avatarExtension = System.IO.Path.GetExtension(model.Avatar.FileName);
+                    model.Avatar.SaveImage(avatarName, avatarExtension, "avatars");
+                    user.Avatar = avatarName + avatarExtension;
+                }
+                    IdentityResult result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
                     await _signInManagerService.RefreshSignInAsync(user);
@@ -433,6 +442,7 @@ namespace EShop.Web.Controllers
                     IsActive = true,
                     EmailConfirmed = true,
                     CreatedDateTime = DateTime.Now,
+                    Avatar = PublicConstantStrings.UserDefaultAvatar,
                     //UserClaims =
                     //[
                     //    new()

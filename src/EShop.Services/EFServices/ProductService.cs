@@ -33,7 +33,7 @@ namespace EShop.Services.EFServices
                     Properties = p.ProductProperties.Select(p => $"{p.Title} ||| {p.Value}").ToList(),
                 }).SingleOrDefaultAsync();
         }
-       
+
         public async Task<Product?> GetProductToUpdateAsync(int id)
         {
             return await _products
@@ -83,6 +83,21 @@ namespace EShop.Services.EFServices
 
                    }).ToListAsync();
         }
+        public async Task<List<ProductPreviewViewModel>> GetBestSellingProductAsync(int take = 5)
+        {
+            return await _products.Select(p => new ProductPreviewViewModel
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Image = p.ProductImages.OrderBy(img => img.Id).Select(img => img.Title).FirstOrDefault(),
+                SoldCount = p.CartDetails.Where(cd => cd.Cart.IsPay).Sum(cd => (int?)cd.Count) ?? 0,
+            })
+            .Where(x => x.SoldCount > 0).
+            OrderByDescending(x => x.SoldCount).
+            Take(take).
+            ToListAsync();
+        }
+
         public int GetMinPrice()
         {
             return _products.Min(x => x.Price);

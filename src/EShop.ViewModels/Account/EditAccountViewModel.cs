@@ -1,7 +1,9 @@
 ﻿using EShop.Common.Constants;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -53,6 +55,8 @@ namespace EShop.ViewModels.Account
         [RegularExpression(@"^[\u0600-\u06FF,\u0590-\u05FF\s]*$",
         ErrorMessage = "لطفا تنها از حروف فارسی استفاده نمائید")]
         public string? LastName { get; set; }
+        [DisplayName("آواتار")]
+        public IFormFile? Avatar { get; set; }
     }
 }
 

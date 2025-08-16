@@ -23,6 +23,10 @@ namespace EShop.Web.Controllers
         {
             return View(await categoryService.GetAllFieldsAsync2());
         }
+        public  async Task<IActionResult> RemoveAsync()
+        {
+            return View("Remove");
+        }
      
         public IActionResult Privacy()
         {

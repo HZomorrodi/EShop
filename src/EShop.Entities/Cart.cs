@@ -14,9 +14,9 @@ namespace EShop.Entities
         public int UserId { get; set; }
         public int TotalPrice { get; set; }
         public bool IsPay { get; set; }
-        public int RefId { get; set; }
+        public string? RefId { get; set; }
         [MaxLength(300)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
         #endregion
         #region Relations
         public virtual User User { get; set; }

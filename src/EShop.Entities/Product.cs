@@ -23,6 +23,7 @@ namespace EShop.Entities
         #region Relations
 
         public virtual Category Category { get; set; } 
+        public virtual ICollection<CartDetail> CartDetails { get; set; } = [];
         public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
         public virtual ICollection<ProductProperty> ProductProperties { get; set; } = [];
         #endregion

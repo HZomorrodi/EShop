@@ -19,6 +19,7 @@ namespace EShop.Services.EFServices.Identity
         {
             ClaimsPrincipal principal = await base.CreateAsync(user);
             ((ClaimsIdentity)principal.Identity).AddClaims([new Claim(IdentityClaimNames.FullName, user.FullName)]);
+            ((ClaimsIdentity)principal.Identity).AddClaims([new Claim(IdentityClaimNames.Avatar, user.Avatar)]);
             return principal;
         }
     }

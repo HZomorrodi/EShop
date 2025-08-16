@@ -13,5 +13,6 @@ namespace EShop.ViewModels.Products
         public string Title { get; set; }
 
         public string Image { get; set; }
+        public int SoldCount { get; set; }
     }
 }

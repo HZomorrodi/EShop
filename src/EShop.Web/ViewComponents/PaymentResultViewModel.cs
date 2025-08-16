@@ -4,6 +4,6 @@
     {
         public bool IsPay { get; set; }
         public string TotalPrice { get; set; }
-        public int RefId { get; set; }
+        public string RefId { get; set; }
     }
 }

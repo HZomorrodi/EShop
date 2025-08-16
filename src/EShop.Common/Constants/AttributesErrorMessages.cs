@@ -15,5 +15,6 @@ namespace EShop.Common.Constants
         public const string RegularExpressionErrorMessage = " {0} را به درستی وارد کنید ";
         public const string RemoteErrorMessage = "  این {0} قبلا درسیستم ثبت شده است";
         public const string CompareErrorMessage = "{1} با تکرار آن تطابق ندارد";
+        public const string RangeMessage = "{0} باید در بازه {1} و {2} باشد";
     }
 }

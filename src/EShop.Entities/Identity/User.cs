@@ -23,5 +23,7 @@ namespace EShop.Entities.Identity
         [NotMapped]
         public string FullName { get { return $"{FirstName} {LastName}"; } }
         public bool IsActive { get; set; }
+        [MaxLength(50)]
+        public string Avatar { get; set; }
     }
 }

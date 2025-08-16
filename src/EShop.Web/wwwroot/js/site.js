@@ -84,7 +84,7 @@ $('.offcanvas-body').on("click", '.remove-btn', function () {
 
 function increaseOrLowOffCartDetail(productId, isIncrease, card, removeAll = false) {
     $.ajax({
-        url: '/Cart/ ',
+        url: '/Cart/IncreaseOrLowOff',
         type: 'POST',
         data: {
             productId, isIncrease, removeAll

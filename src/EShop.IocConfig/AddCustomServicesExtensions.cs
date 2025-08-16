@@ -61,6 +61,7 @@ namespace EShop.IocConfig
             services.AddScoped<ICartDetailService, CartDetailService>();    
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
+            services.AddHttpClient();
 
             services.AddIdentity<User, Role>(setupAction).
                 //AddEntityFrameworkStores<EShopDbContext>().

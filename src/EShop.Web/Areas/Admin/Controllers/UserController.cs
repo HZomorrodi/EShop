@@ -41,6 +41,7 @@ namespace EShop.Web.Areas.Admin.Controllers
                     EmailConfirmed = true,
                     CreatedDateTime = DateTime.Now,
                     IsActive = true,
+                    Avatar = PublicConstantStrings.UserDefaultAvatar,
                 };
                 Microsoft.AspNetCore.Identity.IdentityResult result = await _userManagerService.CreateAsync(user, model.Password);
                 if (result.Succeeded)
