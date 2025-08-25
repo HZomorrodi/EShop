@@ -19,6 +19,7 @@ namespace EShop.DataLayer.Context
         public DbSet<Slider> Sliders { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartDetail> CartDetails { get; set; }
+        public DbSet<UserInformation> UserInformation { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

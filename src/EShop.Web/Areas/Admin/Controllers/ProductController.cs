@@ -142,16 +142,18 @@ namespace EShop.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            try
+            var productToDelete = await productService.GetProductToDelete(id);
+            if (productToDelete is null)
+                return View("Error");
+            productService.Remove(productToDelete);
+            await uow.SaveChangesAsync();
+            foreach (var image in productToDelete.ProductImages)
             {
-                return RedirectToAction(nameof(Index));
+                WorkWithImages.RemoveImage(image.Title, "products");
             }
-            catch
-            {
-                return View();
-            }
+            return RedirectToAction(nameof(Index));
         }
         [HttpPost]
         [ValidateAntiForgeryToken]

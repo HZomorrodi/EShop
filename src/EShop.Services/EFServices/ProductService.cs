@@ -51,6 +51,7 @@ namespace EShop.Services.EFServices
                 Title = p.Title,
                 Price = p.Price,
                 CategoryTitle = p.Category.Title,
+                CanRemove = !p.CartDetails.Any(),
             })];
         }
 
@@ -109,7 +110,7 @@ namespace EShop.Services.EFServices
         public async Task<Product?> GetProductToDelete(int id)
         {
             return await _products
-                .Where(p => p.Id == id && p.Price > 25)
+                .Where(p => p.Id == id && !p.CartDetails.Any())
                 .Include(p => p.ProductImages)
                 .SingleOrDefaultAsync();
         }

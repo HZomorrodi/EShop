@@ -1,10 +1,12 @@
 ﻿using EShop.DataLayer.Context;
 using EShop.Entities;
 using EShop.Services.Contracts;
+using EShop.Services.Contracts.Identity;
 using EShop.Services.EFServices;
 using EShop.ViewModels.Products;
 using EShop.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -12,22 +14,32 @@ using System.Threading.Tasks;
 
 namespace EShop.Web.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, IProductService productService, ICategoryService categoryService, IUnitOfWork uow) : Controller
+    public class HomeController(ILogger<HomeController> logger, IProductService productService, ICategoryService categoryService, IUserManagerService userManager, IUnitOfWork uow) : Controller
     {
         private readonly ILogger<HomeController> _logger = logger;
         public IProductService _productService { get; } = productService;
         private readonly ICategoryService categoryService = categoryService;
+        private readonly IUserManagerService _userManager = userManager;
         public IUnitOfWork _uow { get; } = uow;
 
         public async Task<IActionResult> Index()
         {
+            Entities.Identity.User? user = await _userManager.FindByIdAsync(1.ToString());
+            user.UserInformation = new UserInformation()
+            {
+                BirthDate = DateTime.Now,
+                EyeColor = EyeColor.Green,
+                FullName = "Tea",
+                NationalCode = "1",
+            };
+            //await _uow.SaveChangesAsync();
             return View(await categoryService.GetAllFieldsAsync2());
         }
-        public  async Task<IActionResult> RemoveAsync()
+        public async Task<IActionResult> RemoveAsync()
         {
             return View("Remove");
         }
-     
+
         public IActionResult Privacy()
         {
             return View();

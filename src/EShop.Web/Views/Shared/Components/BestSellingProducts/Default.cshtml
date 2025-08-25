@@ -12,7 +12,7 @@
 						<a asp-controller="Product" asp-action="Details" asp-route-id="@Model[i].Id" asp-route-title="@Model[i].Title" class="text-decoration-none">
 							<div class="card">
 								<div class="card-img">
-									<img src="/images/products/@Model[i].Image" class="img-fluid">
+									<img src="/images/products/@Model[i].Image" style="height: 250px" class="img-fluid">
 								</div>
 								<div class="card-img-overlay">@Model[i].Title</div>
 							</div>

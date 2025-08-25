@@ -25,5 +25,6 @@ namespace EShop.Entities.Identity
         public bool IsActive { get; set; }
         [MaxLength(50)]
         public string Avatar { get; set; }
+        public UserInformation UserInformation { get; set; }
     }
 }

@@ -73,7 +73,7 @@ namespace EShop.Services.EFServices
         }).ToListAsync();
 
         public Category GetToDelete(int id)
-            => _categories.Where(x => !x.Children.Any())
-                .SingleOrDefault(x => x.Id == id);
+            => _categories.Where(x => x.Id == id && !x.Products.Any())
+                .SingleOrDefault();
     }
 }
