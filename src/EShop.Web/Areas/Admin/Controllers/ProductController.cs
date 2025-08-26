@@ -146,7 +146,7 @@ namespace EShop.Web.Areas.Admin.Controllers
         {
             var productToDelete = await productService.GetProductToDelete(id);
             if (productToDelete is null)
-                return View("Error");
+                return View("Error2");
             productService.Remove(productToDelete);
             await uow.SaveChangesAsync();
             foreach (var image in productToDelete.ProductImages)

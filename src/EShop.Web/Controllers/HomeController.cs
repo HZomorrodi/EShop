@@ -24,6 +24,8 @@ namespace EShop.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
+            _logger.LogInformation("Hellow, this is the index!");
+            _logger.LogWarning("Hellow, this is the index!");
             Entities.Identity.User? user = await _userManager.FindByIdAsync(1.ToString());
             user.UserInformation = new UserInformation()
             {
@@ -42,6 +44,7 @@ namespace EShop.Web.Controllers
 
         public IActionResult Privacy()
         {
+            throw new Exception("IT is Privacy");
             return View();
         }
 

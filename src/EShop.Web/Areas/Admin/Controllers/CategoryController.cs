@@ -83,7 +83,7 @@ namespace EShop.Web.Areas.Admin.Controllers
             }
 
             if (model.Id == model.ParentId)
-                return View("Error");
+                return View("Error2");
             categoryService.Update(new Category
             {
                 Id = model.Id,
