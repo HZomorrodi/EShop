@@ -13,6 +13,7 @@ try
 {
 
     var builder = WebApplication.CreateBuilder(args);
+    builder.Services.AddRazorPages();
 
     // Add services to the container.
     builder.Services.Configure<ConnectionStringsModel>(builder.Configuration.GetSection("ConnectionStrings"));
@@ -51,7 +52,8 @@ try
         pattern: "{controller=Home}/{action=Index}/{id?}")
         .WithStaticAssets();
 
-
+    app.MapRazorPages()
+   .WithStaticAssets();
     app.Run();
 }
 catch (Exception exception)

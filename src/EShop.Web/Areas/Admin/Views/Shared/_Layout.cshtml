@@ -49,7 +49,7 @@
 		<div class="row">
 			<!-- Right Sidebar (3 columns) -->
 			<div class="col-lg-3 sidebar">
-				<partial name="_AdminMenusPartial" />
+				<partial name="/Areas/Admin/Views/Shared/_AdminMenusPartial.cshtml" />
 			</div>
 
 			<!-- Main Content (9 columns) -->
@@ -60,6 +60,9 @@
 			</div>
 		</div>
 	</div>
+	<script>
+		let isUserAuthenticated = @Json.Serialize(User.Identity.IsAuthenticated)
+	</script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 

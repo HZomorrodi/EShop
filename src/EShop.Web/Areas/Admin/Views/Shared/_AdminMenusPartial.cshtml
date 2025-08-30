@@ -3,29 +3,29 @@
 	<li class="nav-item dropdown mb-2">
 		<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت دسته بندی‌ها</a>
 		<ul class="dropdown-menu">
-			<li><a class="dropdown-item" asp-action="Index" asp-controller="Category">لیست تمامی دسته بندی ها</a></li>
-			<li><a class="dropdown-item" asp-action="Add" asp-controller="Category">افزودن دسته جدید</a></li>
+			<li><a class="dropdown-item" asp-action="Index" asp-controller="Category" asp-area="Admin">لیست تمامی دسته بندی ها</a></li>
+			<li><a class="dropdown-item" asp-action="Add" asp-controller="Category" asp-area="Admin">افزودن دسته جدید</a></li>
 		</ul>
 	</li>
 	<li class="nav-item dropdown mb-2">
 		<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت کاربران</a>
 		<ul class="dropdown-menu">
-			<li><a class="dropdown-item" asp-action="Index" asp-controller="User">لیست کاربران</a></li>
+			<li><a class="dropdown-item" asp-action="Index" asp-controller="User" asp-area="Admin">لیست کاربران</a></li>
 			<li><a class="dropdown-item" asp-action="Add" asp-controller="User">افزودن کاربر جدید</a></li>
 		</ul>
 	</li>
 	<li class="nav-item dropdown mb-2">
 		<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت نقش‌ها</a>
 		<ul class="dropdown-menu">
-			<li><a class="dropdown-item" asp-action="Index" asp-controller="Role">لیست نقش‌ها</a></li>
-			<li><a class="dropdown-item" asp-action="Add" asp-controller="Role">افزودن نقش‌ جدید</a></li>
+			<li><a class="dropdown-item" asp-action="Index" asp-controller="Role" asp-area="Admin">لیست نقش‌ها</a></li>
+			<li><a class="dropdown-item" asp-action="Add" asp-controller="Role" asp-area="Admin">افزودن نقش‌ جدید</a></li>
 		</ul>
 	</li>
 	<li class="nav-item dropdown mb-2">
 		<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت محصولات</a>
 		<ul class="dropdown-menu">
-			<li><a class="dropdown-item" asp-action="Index" asp-controller="Product">لیست محصولات</a></li>
-			<li><a class="dropdown-item" asp-action="Add" asp-controller="Product">افزودن محصول جدید</a></li>
+			<li><a class="dropdown-item" asp-action="Index" asp-controller="Product" asp-area="Admin">لیست محصولات</a></li>
+			<li><a class="dropdown-item" asp-action="Add" asp-controller="Product" asp-area="Admin">افزودن محصول جدید</a></li>
 		</ul>
 	</li>
 	<li class="nav-item dropdown mb-2">
@@ -36,9 +36,16 @@
 		</ul>
 	</li>
 	<li class="nav-item dropdown mb-2">
+		<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت اسلایدر ها (Razor pages)</a>
+		<ul class="dropdown-menu">
+			<li><a class="dropdown-item" asp-page="/AdminPage/Sliders/Index" >لیست اسلایدر ها</a></li>
+			<li><a class="dropdown-item" asp-page="/AdminPage/Sliders/Create" >افزودن اسلایدر جدید</a></li>
+		</ul>
+	</li>
+	<li class="nav-item dropdown mb-2">
 		<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">مدیریت سفارشات</a>
 		<ul class="dropdown-menu">
-			<li><a class="dropdown-item" asp-action="Index" asp-controller="Cart">لیست سفارشات پرداختی</a></li>
+			<li><a class="dropdown-item" asp-action="Index" asp-controller="Cart" asp-area="Admin">لیست سفارشات پرداختی</a></li>
 		</ul>
 	</li>
 	<li class="nav-item dropdown mb-2">
