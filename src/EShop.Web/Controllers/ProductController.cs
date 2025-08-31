@@ -9,9 +9,14 @@ namespace EShop.Web.Controllers
     {
         private readonly IProductService _productService = productService;
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(string searchKey = "")
         {
-            return View();
+            ProductCartsWithPagination productsWithPagination = await _productService.GetProductsWithFilterAndPagination(searchKey);
+            SearchingProductsViewModel model = new()
+            {
+                Products = productsWithPagination.Products,
+            };
+            return View(model);
         }
         //[Route("Product/{Id}/{title}")]
         public async Task<IActionResult> Details(int id, string title)

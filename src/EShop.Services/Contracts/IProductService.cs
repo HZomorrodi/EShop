@@ -10,6 +10,7 @@ namespace EShop.Services.Contracts
 {
     public interface IProductService : IGenericService<Product>
     {
+        Task<ProductCartsWithPagination> GetProductsWithFilterAndPagination(string searchKey = "");
         Task<EditProductViewModel?> GetProductToEdit(int id);
         Task<Product?> GetProductToUpdateAsync(int id);
         List<ShowProductViewModel> GetProductsPreview();

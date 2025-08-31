@@ -17,6 +17,22 @@ namespace EShop.Services.EFServices
         public readonly DbSet<Product> _products = uow.Set<Product>();
         public readonly IUnitOfWork _uow = uow;
 
+        public async Task<ProductCartsWithPagination> GetProductsWithFilterAndPagination(string searchKey = "")
+        {
+            IQueryable<Product> product = _products.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(searchKey))
+                product = product.Where(p => p.Title.Contains(searchKey));
+            return new ProductCartsWithPagination()
+            {
+                Products = await product.Select(p => new ProductCartViewModel()
+                {
+                    Id = p.Id,
+                    Image = p.ProductImages.First().Title,
+                    Title = p.Title,
+                    Price = p.Price,
+                }).ToListAsync(),
+            };
+        }
         public async Task<EditProductViewModel?> GetProductToEdit(int id)
         {
             return await _products

@@ -24,22 +24,22 @@ namespace EShop.Web.Pages.AdminPage.Sliders
             ViewData["Products"] = (await _productService.GetProductForComboBox()).CreateSelectListItem();
         }
 
-        public async Task<IActionResult> OnPostAsync(AddSliderViewModel slider1)
+        public async Task<IActionResult> OnPostAsync(AddSliderViewModel slider)
         {
             if (!ModelState.IsValid)
             {
-                ViewData["Products"] = (await _productService.GetProductForComboBox()).CreateSelectListItem(selectedItem: slider1.ProductId);
+                ViewData["Products"] = (await _productService.GetProductForComboBox()).CreateSelectListItem(selectedItem: slider.ProductId);
                 ModelState.AddModelError(string.Empty, PublicConstantStrings.ModelStateErrorMessage);
                 return Page();
             }
-            var imageExtension = Path.GetExtension(slider1.Image.FileName);
+            var imageExtension = Path.GetExtension(slider.Image.FileName);
             var imageName = Guid.NewGuid().ToString("N");
-            slider1.Image.SaveImage(imageName, imageExtension, "sliders");
+            slider.Image.SaveImage(imageName, imageExtension, "sliders");
             await _sliderService.AddAsync(new Slider()
             {
-                FirstTitle = slider1.FirstTitle,
-                SecondTitle = slider1.SecondTitle,
-                ProductId = slider1.ProductId,
+                FirstTitle = slider.FirstTitle,
+                SecondTitle = slider.SecondTitle,
+                ProductId = slider.ProductId,
                 Image = imageName + imageExtension
             });
             await _uow.SaveChangesAsync();
