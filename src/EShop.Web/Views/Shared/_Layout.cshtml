@@ -32,8 +32,9 @@
                 <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
                     <div class="navbar-nav d-flex align-items-start align-items-lg-start my-2 my-lg-0 ">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">خانه</a>
-                        <form class="d-flex" role="search">
-                            <input class="form-control" type="search" placeholder="جستجو" aria-label="Search">
+                        <a class="nav-link" asp-controller="Product" asp-action="Index">محصولات</a>
+                        <form class="d-flex" role="search" asp-controller="Product" asp-action="Index" asp-area="" method="get">
+                            <input class="form-control" name="s" value="@ViewBag.searchKey" type="search" placeholder="جستجو" aria-label="Search">
                             <button class="btn btn-outline-success" type="submit">جستجو</button>
                         </form>
                     </div>

@@ -1,0 +1,130 @@
+﻿@using EShop.Entities
+@model List<Product>
+
+@{
+    ViewData["Title"] = "Product Search";
+}
+
+<h1>Product Search</h1>
+
+<!-- Search Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Search Filters</h5>
+    </div>
+    <div class="card-body">
+        <form id="searchForm" method="get" asp-action="Search">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Name">Product Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name"
+                               value="@Context.Request.Query["Name"]" placeholder="Search products...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="Category">Category</label>
+                        <select class="form-control" id="Category" name="Category">
+                            <option value="">All Categories</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Books">Books</option>
+                            <option value="Home">Home & Garden</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="MinPrice">Min Price</label>
+                        <input type="number" class="form-control" id="MinPrice" name="MinPrice"
+                               value="@Context.Request.Query["MinPrice"]" placeholder="Min" step="0.01">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="MaxPrice">Max Price</label>
+                        <input type="number" class="form-control" id="MaxPrice" name="MaxPrice"
+                               value="@Context.Request.Query["MaxPrice"]" placeholder="Max" step="0.01">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="SortBy">Sort By</label>
+                        <select class="form-control" id="SortBy" name="SortBy">
+                            <option value="name">Name (A-Z)</option>
+                            <option value="price_asc">Price (Low to High)</option>
+                            <option value="price_desc">Price (High to Low)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="InStockOnly" name="InStockOnly"
+                               value="true" @(Context.Request.Query["InStockOnly"] == "true" ? "checked" : "")>
+                        <label class="form-check-label" for="InStockOnly">In Stock Only</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button type="button" id="resetBtn" class="btn btn-outline-secondary mt-3">
+                        <i class="fas fa-times"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Container -->
+<div id="searchResults">
+    @await Html.PartialAsync("_ProductList", Model)
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            // Set selected values from query string
+            $('#Category').val('@Context.Request.Query["Category"]');
+            $('#SortBy').val('@Context.Request.Query["SortBy"]');
+
+            // AJAX form submission
+            $('#searchForm').on('submit', function(e) {
+                e.preventDefault();
+
+                // Build query string from form
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: $(this).attr('action') + '?' + formData,
+                    type: 'GET',
+                    success: function(data) {
+                        $('#searchResults').html(data);
+                        // Update browser URL without page reload
+                                const urlParams = new URLSearchParams(window.location.search);
+               var t=  urlParams.get('MinPrice')    
+               debugger
+                 window.history.pushState({}, '', '?' + formData);
+                    },
+                    error: function() {
+                        alert('Error performing search');
+                    }
+                });
+            });
+
+            // Reset form
+            $('#resetBtn').on('click', function() {
+                $('#searchForm')[0].reset();
+                $('#searchForm').submit();
+            });
+
+            // Handle browser back/forward buttons
+            window.onpopstate = function() {
+                // Reload search when URL changes
+                $('#searchForm').submit();
+            };
+        });
+    </script>
+}

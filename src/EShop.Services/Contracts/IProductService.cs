@@ -10,7 +10,7 @@ namespace EShop.Services.Contracts
 {
     public interface IProductService : IGenericService<Product>
     {
-        Task<ProductCartsWithPagination> GetProductsWithFilterAndPagination(string searchKey = "");
+        Task<ProductCartsWithPagination> GetProductsWithFilterAndPagination(SearchingProductsViewModel model);
         Task<EditProductViewModel?> GetProductToEdit(int id);
         Task<Product?> GetProductToUpdateAsync(int id);
         List<ShowProductViewModel> GetProductsPreview();
@@ -21,5 +21,6 @@ namespace EShop.Services.Contracts
         int GetMinPrice();
         int GetMaxPrice();
         Task<Product?> GetProductToDelete(int id);
+        IQueryable<Product> GetProductQuery();
     }
 }

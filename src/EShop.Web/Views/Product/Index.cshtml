@@ -1,2 +1,140 @@
-﻿@using EShop.ViewModels.Products
+﻿@using EShop.Common.Extensions
+@using EShop.ViewModels.Products
 @model SearchingProductsViewModel
+@{
+    ViewData["Title"] = "محصولات";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="mt-4 border rounded p-2">
+                <p class="text-center">جستجو بر اساس دسته بندی</p>
+                <form method="get" id="categoryFilterForm">
+                    <input type="hidden" name="s" value="@Model.s" />
+                    @foreach (var item in ViewBag.Categories)
+                    {
+                        <p>
+                            @item.Title
+                            <br />
+                            @foreach (var subitem in item.Children)
+                            {
+                                @:&nbsp;&nbsp;&nbsp;
+                                <label style="cursor: pointer;">
+                                    <!-- Add cursor pointer for better UX -->
+                                    <input name="selectedCategories" type="checkbox" value="@subitem.Id" @(Model.selectedCategories.Contains(subitem.Id) ? "checked" : "") />
+                                    @subitem.Title
+                                </label>
+                                <br />
+                            }
+                        </p>
+                    }
+                    <input type="hidden" asp-for="Condition" value="@Model.Condition" />
+                    <input type="submit" value="search" class="btn btn-primary" />
+                </form>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div>
+                <form method="get">
+                    <input type="hidden" name="s" value="@Model.s" />
+                    @foreach (var subCategory in Model.selectedCategories)
+                    {
+                        <input type="hidden" asp-for="selectedCategories" value="@subCategory" />
+                    }
+                    @foreach (ProductSearchConditionEnum item in Enum.GetValues<ProductSearchConditionEnum>())
+                    {
+                        <button name="Condition" value="@item" class="btn btn-sm btn-outline-secondary @(item == Model.Condition ? "active" : "")">@item.GetEnumDisplayName()</button>
+                    }
+                </form>
+            </div>
+            <br />
+            <div class="row" id="product-carts">
+                @foreach (var item in Model.Products)
+                {
+                    <div class="card col-md-3">
+                        <img height="150"
+                             src="~/images/products/@item.Image" class="card-img-top" alt="@item.Title">
+                        <div class="card-body">
+                            <h5 class="show-extra-text-in-3-dots card-title">@item.Title</h5>
+                            <p class="card-text">@item.Price.ToString("N0") تومان</p>
+                            <a asp-action="Details" asp-route-id="@item.Id"
+                               asp-route-title="@item.Title" class="btn btn-primary">جزییات</a>
+                        </div>
+                    </div>
+                }
+
+            </div>
+            <br />
+            <div class="btn-toolbar justify-content-center" role="toolbar">
+                <form asp-action="Index" method="get">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                                <button name="page" value="@(Model.Page - 1)" type="submit" class="page-link">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </button>
+                            </li>
+                            @for (int counter = 1; counter <= Model.AllPagesCount; counter++)
+                            {
+                                <li class="page-item @(Model.Page == counter ? "active" : "")">
+                                    <button name="page" value="@counter" type="submit" class="page-link">
+                                        @counter
+                                    </button>
+                                </li>
+                            }
+                            <li class="page-item @(Model.Page == Model.AllPagesCount ? "disabled" : "")">
+                                <button name="page" value="@(Model.Page + 1)" type="submit" class="page-link">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            // Category change event
+            $("input[name='selectedCategories']").on("change", function(e) {
+            e.preventDefault();
+                var formData = $("#categoryFilterForm").serialize();
+                $.ajax({
+                    url: window.location.href,
+                    type: "GET",
+                    data: formData,
+                    success: function(response) {
+                        // Replace only the products section
+                        $("#product-list-container").html(response);
+                    },
+                    error: function() {
+                        alert("Error loading products");
+                    }
+                });
+            });
+
+            // Page change event (for pagination)
+            $(document).on("submit", "#product-list-container form", function(e) {
+                e.preventDefault();
+
+                var form = $(this);
+                var formData = form.serialize();
+
+                $.ajax({
+                    url: form.attr("action"),
+                    type: form.attr("method"),
+                    data: formData,
+                    success: function(response) {
+                        $("#product-list-container").html(response);
+                    },
+                    error: function() {
+                        alert("Error loading page");
+                    }
+                });
+            });
+        });
+    </script>
+}

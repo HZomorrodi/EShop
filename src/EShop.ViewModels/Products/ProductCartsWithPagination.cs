@@ -9,5 +9,7 @@ namespace EShop.ViewModels.Products
     public class ProductCartsWithPagination
     {
         public List<ProductCartViewModel> Products { get; set; }
+        public int AllPagesCount { get; set; }
+        public int Page { get; set; }
     }
 }

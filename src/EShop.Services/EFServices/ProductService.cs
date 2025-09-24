@@ -6,6 +6,7 @@ using EShop.ViewModels.Products;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,21 +18,68 @@ namespace EShop.Services.EFServices
         public readonly DbSet<Product> _products = uow.Set<Product>();
         public readonly IUnitOfWork _uow = uow;
 
-        public async Task<ProductCartsWithPagination> GetProductsWithFilterAndPagination(string searchKey = "")
+        public async Task<ProductCartsWithPagination> GetProductsWithFilterAndPagination(SearchingProductsViewModel model)
         {
             IQueryable<Product> product = _products.AsQueryable();
-            if (!string.IsNullOrWhiteSpace(searchKey))
-                product = product.Where(p => p.Title.Contains(searchKey));
+            if (!string.IsNullOrWhiteSpace(model.s))
+                product = product.Where(p => p.Title.Contains(model.s.Trim()));
+            product = product.Where(p => p.Price >= model.SelectedMinPrice);
+            if (model.SelectedMaxPrice > 0)
+                product = product.Where(p => p.Price <= model.SelectedMaxPrice);
+            if (model.selectedCategories.Count != 0)
+                product = product.Where(p => model.selectedCategories.Contains(p.CategoryId));
+            product = model.Condition switch
+            {
+                ProductSearchConditionEnum.BestSelling => product.Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    p.ProductImages,
+                    p.Price,
+                    SoldCount = p.CartDetails.Where(cd => cd.Cart.IsPay).Sum(cd => (int?)cd.Count) ?? 0,
+                })
+            .Where(x => x.SoldCount > 0).
+            OrderByDescending(x => x.SoldCount).Select(p => new Product()
+            {
+                Id = p.Id,
+                ProductImages = p.ProductImages,
+                Title = p.Title,
+                Price = p.Price,
+            }),
+                ProductSearchConditionEnum.Newest => product.OrderByDescending(p => p.Id),
+                ProductSearchConditionEnum.Oldest => product.OrderBy(p => p.Id),
+                ProductSearchConditionEnum.Cheapest => product.OrderBy(p => p.Price),
+                ProductSearchConditionEnum.MostExpensive => product.OrderByDescending(p => p.Price),
+                _ => throw new NotImplementedException(),
+            };
+            int allRecordsCount = product.Count();
+            int allPagesCount = (int)
+                (Math.Ceiling(
+                    (decimal)allRecordsCount / model.Take
+                ));
+            if (model.Page < 1)
+                model.Page = 1;
+            if (model.Page > allPagesCount)
+                model.Page = allPagesCount;
+            int skip = allPagesCount > 0 ? (model.Page - 1) * model.Take : 0;
             return new ProductCartsWithPagination()
             {
-                Products = await product.Select(p => new ProductCartViewModel()
+                Products = await product.Skip(skip).Take(model.Take).Select(p => new ProductCartViewModel()
                 {
                     Id = p.Id,
                     Image = p.ProductImages.First().Title,
                     Title = p.Title,
                     Price = p.Price,
                 }).ToListAsync(),
+                AllPagesCount = allPagesCount,
+                Page = model.Page,
             };
+        }
+
+        public IQueryable<Product> GetProductQuery()
+        {
+         return   _products.AsQueryable();
+            
         }
         public async Task<EditProductViewModel?> GetProductToEdit(int id)
         {
@@ -137,5 +185,7 @@ namespace EShop.Services.EFServices
             Id = x.Id,
             Title = x.Title
         }).ToListAsync();
+
+     
     }
 }
