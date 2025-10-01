@@ -11,7 +11,8 @@ namespace EShop.DataLayer.Context
 {
     public class TicketDbContext(DbContextOptions options) : DbContext(options), IUnitOfWork
     {
-        public DbSet<Test> Tests { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         public void MarkAsDeleted<TEntity>(TEntity entity)
             => base.Entry(entity).State = EntityState.Deleted;
