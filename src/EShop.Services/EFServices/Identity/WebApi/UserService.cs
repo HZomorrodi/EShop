@@ -29,6 +29,9 @@ namespace EShop.Services.EFServices.Identity.WebApi
             };
         }
 
-
+        public bool IsExistsByUserNameForAdd(string userName)
+        {
+            return _user.Any(u => u.UserName == userName);
+        }
     }
 }

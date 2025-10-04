@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace EShop.Services.Contracts.Identity.WebApi
 {
-    public interface IUserService:IGenericService<User>
+    public interface IUserService : IGenericService<User>
     {
         Task<UserToBuildJwtTokenViewModel?> GetUserBy(string userName, string password);
+        bool IsExistsByUserNameForAdd(string userName);
     }
 }
