@@ -16,16 +16,14 @@ namespace Ticket.WebApi.Controllers
         private readonly IUserService _userService = userService;
         private readonly ITokenService _tokenService = tokenService;
         private readonly IConfiguration _configuration = configuration;
-        [Route("Login")]
-        [HttpPost]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             UserToBuildJwtTokenViewModel? user = await _userService.GetUserBy(model.UserName, model.Password);
             if (user is not null)
             {
-
-                string generatedToken = _tokenService.BuildToken(_configuration["JWT:Key"], _configuration["JWT:Issuer"], user, model.RememberMe)
-            if (generatedToken is null)
+                string generatedToken = _tokenService.BuildToken(_configuration["JWT:Key"], _configuration["JWT:Issuer"], user, model.RememberMe);
+                if (generatedToken is null)
                 {
                     return BadRequest("user is null");
                 }
@@ -57,6 +55,12 @@ namespace Ticket.WebApi.Controllers
         {
             IEnumerable<System.Security.Claims.Claim> claims = User.Claims;
             return Ok();
+        }
+        [HttpGet("Admin4")]
+        public IActionResult Admin4()
+        {
+            IEnumerable<System.Security.Claims.Claim> claims = User.Claims;
+                return Ok();
         }
     }
 }

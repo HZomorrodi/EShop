@@ -20,7 +20,7 @@ namespace EShop.Services.EFServices.Identity.WebApi
                 new Claim(ClaimTypes.Name,user.UserName),
                 new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
                 ];
-            user.Roles.ForEach(c => claims.Add(new Claim(ClaimTypes.Role, user.UserName)));
+            user.Roles.ForEach(c => claims.Add(new Claim(ClaimTypes.Role, c)));
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new JwtSecurityToken(issuer, issuer, claims,
