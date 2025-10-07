@@ -17,7 +17,7 @@ namespace Ticket.WebApi.Controllers
         private readonly ITokenService _tokenService = tokenService;
         private readonly IConfiguration _configuration = configuration;
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login( LoginViewModel model)
         {
             UserToBuildJwtTokenViewModel? user = await _userService.GetUserBy(model.UserName, model.Password);
             if (user is not null)

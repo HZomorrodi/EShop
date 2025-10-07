@@ -12,5 +12,7 @@ namespace EShop.Services.Contracts.Identity.WebApi
     {
         Task<UserToBuildJwtTokenViewModel?> GetUserBy(string userName, string password);
         bool IsExistsByUserNameForAdd(string userName);
+        bool IsExistsByUserNameForEdit(string userName, int id);
+        Task<User?> GetUserToEdit(int id);
     }
 }

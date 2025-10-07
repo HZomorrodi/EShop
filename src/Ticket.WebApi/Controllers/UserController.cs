@@ -2,6 +2,7 @@
 using EShop.Entities.WebApi;
 using EShop.Services.Contracts.Identity.WebApi;
 using EShop.ViewModels.Users.WebApi;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace Ticket.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UserController(IUserService userService, IRoleService roleService, IUnitOfWork uow) : ControllerBase
     {
         private readonly IUserService _userService = userService;
@@ -48,12 +50,15 @@ namespace Ticket.WebApi.Controllers
                 FullName = model.FullName,
                 PassWord = model.Password,
             };
-            List<Role> existRoles = _roleService.GetRolesBy(model.Roles).ToList();
-            model.Roles.ForEach(role =>
+            if (model.Roles?.Count > 0)
             {
-                Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
-                user.Roles.Add(currentRole ?? new Role { Title = role });
-            });
+                List<Role> existRoles = _roleService.GetRolesBy(model.Roles).ToList();
+                model.Roles.ForEach(role =>
+                {
+                    Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
+                    user.Roles.Add(currentRole ?? new Role { Title = role });
+                });
+            }
             await _userService.AddAsync(user);
             await _uow.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { user.Id }, model);
@@ -63,12 +68,12 @@ namespace Ticket.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(int id, [FromBody] AddUserViewModel model)
         {
-            User user = await _userService.FindByIdAsync(id);
+            User? user = await _userService.GetUserToEdit(id);
             if (user is null)
             {
                 return BadRequest();
             }
-            bool checkForDuplicateUserName = _userService.IsExistsByUserNameForAdd(model.UserName);
+            bool checkForDuplicateUserName = _userService.IsExistsByUserNameForEdit(model.UserName, id);
             if (checkForDuplicateUserName)
             {
                 return BadRequest("نام کاربری تکراری میباشد");
@@ -85,7 +90,7 @@ namespace Ticket.WebApi.Controllers
                 user.Roles.Add(currentRole ?? new Role { Title = role });
             });
             _userService.Update(user);
-            //await _uow.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { user.Id }, model);
         }
 
@@ -98,7 +103,7 @@ namespace Ticket.WebApi.Controllers
             {
                 return BadRequest();
             }
-            _userService.Remove(id);
+            _userService.Remove(user);
             await _uow.SaveChangesAsync();
             return Ok();
         }

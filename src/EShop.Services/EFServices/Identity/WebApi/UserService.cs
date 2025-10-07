@@ -29,9 +29,19 @@ namespace EShop.Services.EFServices.Identity.WebApi
             };
         }
 
+        public async Task<User?> GetUserToEdit(int id)
+        {
+            return await _user.Include(u => u.Roles).SingleOrDefaultAsync(u => u.Id == id);
+        }
+
         public bool IsExistsByUserNameForAdd(string userName)
         {
             return _user.Any(u => u.UserName == userName);
+        }
+
+        public bool IsExistsByUserNameForEdit(string userName, int id)
+        {
+            return _user.Any(u => u.UserName == userName && u.Id != id);
         }
     }
 }
