@@ -1,4 +1,5 @@
-﻿using EShop.DataLayer.Context;
+﻿using EShop.Common.Extensions;
+using EShop.DataLayer.Context;
 using EShop.Entities.WebApi;
 using EShop.Services.Contracts.Identity.WebApi;
 using EShop.ViewModels.Users.WebApi;
@@ -18,7 +19,7 @@ namespace EShop.Services.EFServices.Identity.WebApi
         public async Task<UserToBuildJwtTokenViewModel?> GetUserBy(string userName, string password)
         {
             User? user = await _user.Include(u => u.Roles)
-                .SingleOrDefaultAsync(u => u.UserName == userName && u.PassWord == password);
+                .SingleOrDefaultAsync(u => u.UserName == userName && u.PassWord == password.ToHash());
             if (user is null)
                 return null;
             return new UserToBuildJwtTokenViewModel()

@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\images\avatars\**" />
+    <Content Remove="wwwroot\images\avatars\**" />
+    <EmbeddedResource Remove="wwwroot\images\avatars\**" />
+    <None Remove="wwwroot\images\avatars\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
@@ -22,6 +29,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EShop.IocConfig\EShop.IocConfig.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

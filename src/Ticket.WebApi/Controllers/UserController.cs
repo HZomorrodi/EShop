@@ -1,4 +1,5 @@
-﻿using EShop.DataLayer.Context;
+﻿using EShop.Common.Extensions;
+using EShop.DataLayer.Context;
 using EShop.Entities.WebApi;
 using EShop.Services.Contracts.Identity.WebApi;
 using EShop.ViewModels.Users.WebApi;
@@ -37,7 +38,7 @@ namespace Ticket.WebApi.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] AddUserViewModel model)
+        public async Task<IActionResult> Post([FromForm] AddUserViewModel model)
         {
             bool checkForDuplicateUserName = _userService.IsExistsByUserNameForAdd(model.UserName);
             if (checkForDuplicateUserName)
@@ -48,17 +49,23 @@ namespace Ticket.WebApi.Controllers
             {
                 UserName = model.UserName,
                 FullName = model.FullName,
-                PassWord = model.Password,
+                PassWord = model.Password.ToHash(),
             };
             if (model.Roles?.Count > 0)
             {
-                List<Role> existRoles = _roleService.GetRolesBy(model.Roles).ToList();
+                List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
                 model.Roles.ForEach(role =>
                 {
                     Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
                     user.Roles.Add(currentRole ?? new Role { Title = role });
                 });
             }
+            //upload image
+            string avatarName = Guid.NewGuid().ToString("N");
+            string avatarExtension = Path.GetExtension(model.Avatar.FileName);
+            model.Avatar.SaveImage(avatarName, avatarExtension, "avatars");
+            user.Avatar = avatarName + avatarExtension;
+            //
             await _userService.AddAsync(user);
             await _uow.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { user.Id }, model);
@@ -81,15 +88,17 @@ namespace Ticket.WebApi.Controllers
 
             user.UserName = model.UserName;
             user.FullName = model.FullName;
-            user.PassWord = model.Password;
+            user.PassWord = model.Password.ToHash();
             user.Roles.Clear();
-            List<Role> existRoles = _roleService.GetRolesBy(model.Roles).ToList();
-            model.Roles.ForEach(role =>
+            if (model.Roles?.Count > 0)
             {
-                Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
-                user.Roles.Add(currentRole ?? new Role { Title = role });
-            });
-            _userService.Update(user);
+                List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
+                model.Roles.ForEach(role =>
+                {
+                    Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
+                    user.Roles.Add(currentRole ?? new Role { Title = role });
+                });
+            }
             await _uow.SaveChangesAsync();
             return CreatedAtAction(nameof(Get), new { user.Id }, model);
         }

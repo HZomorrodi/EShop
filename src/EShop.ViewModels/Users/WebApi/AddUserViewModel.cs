@@ -17,6 +17,6 @@ namespace EShop.ViewModels.Users.WebApi
 
         public List<string>? Roles { get; set; }
 
-        public IFormFile? Avatar { get; set; }
+        public IFormFile Avatar { get; set; }
     }
 }

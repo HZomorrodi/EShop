@@ -22,7 +22,7 @@ namespace EShop.Entities.WebApi
         [MaxLength(100)]
         public string PassWord { get; set; }
         [MaxLength(50)]
-        public string? Avatar { get; set; }
+        public string Avatar { get; set; }
         #endregion
         #region Relations
         public virtual ICollection<Role> Roles { get; set; } = [];
