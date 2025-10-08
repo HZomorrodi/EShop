@@ -11,13 +11,23 @@ namespace Ticket.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Produces("application/json")]
     public class AccountController(IUserService userService, ITokenService tokenService, IConfiguration configuration) : ControllerBase
     {
         private readonly IUserService _userService = userService;
         private readonly ITokenService _tokenService = tokenService;
         private readonly IConfiguration _configuration = configuration;
+        /// <summary>
+        /// Login action
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <response code="200">Everything is OK and you get the JWT token</response>
+        /// <response code="400">Check the model state OR ```UserName``` OR ```Password``` is incorrect</response>
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost("Login")]
-        public async Task<IActionResult> Login( LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             UserToBuildJwtTokenViewModel? user = await _userService.GetUserBy(model.UserName, model.Password);
             if (user is not null)
@@ -60,7 +70,7 @@ namespace Ticket.WebApi.Controllers
         public IActionResult Admin4()
         {
             IEnumerable<System.Security.Claims.Claim> claims = User.Claims;
-                return Ok();
+            return Ok();
         }
     }
 }
