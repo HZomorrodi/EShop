@@ -24,8 +24,10 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API documentation for EShop project"
     });
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+    var xmlFiles = Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly).ToList();
+    xmlFiles.ForEach(xmlFile => options.IncludeXmlComments(xmlFile));
+
     //  Add JWT authentication support to Swagger UI
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -33,7 +35,7 @@ builder.Services.AddSwaggerGen(options =>
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
-        Scheme = "bearer"
+        Scheme = "bearer"   
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement

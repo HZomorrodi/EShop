@@ -1,6 +1,6 @@
 ﻿using EShop.DataLayer.Context;
 using EShop.Services.Contracts.Identity.WebApi;
-using EShop.ViewModels.Account;
+using EShop.ViewModels.Account.WebApi;
 using EShop.ViewModels.Users.WebApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
