@@ -41,8 +41,8 @@
             [HttpPost]
             public async Task<IActionResult> Post([FromForm] AddUserViewModel model)
             {
-                bool checkForDuplicateUserName = _userService.IsExistsByUserNameForAdd(model.UserName);
-                if (checkForDuplicateUserName)
+                bool duplicate = _userService.IsExistsByUserNameForAdd(model.UserName);
+                if (duplicate)
                 {
                     return BadRequest("نام کاربری تکراری میباشد");
                 }
@@ -125,8 +125,67 @@
                 });
             }
 
-            // DELETE api/<UserController>/5
-            [HttpDelete("{id}")]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchAsync(int id, [FromForm] PatchUserViewModel model)
+        {
+            var user = await _userService.GetUserToEdit(id);
+            if (user is null)
+                return NotFound();
+
+            // --- Update only what’s provided ---
+
+            if (!string.IsNullOrWhiteSpace(model.UserName))
+            {
+                bool duplicate = _userService.IsExistsByUserNameForEdit(model.UserName, id);
+                if (duplicate)
+                    return BadRequest("نام کاربری تکراری می‌باشد");
+
+                user.UserName = model.UserName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(model.FullName))
+                user.FullName = model.FullName;
+
+            if (!string.IsNullOrWhiteSpace(model.Password))
+                user.PassWord = model.Password.ToHash();
+
+            if (model.Roles?.Count > 0)
+            {
+                user.Roles.Clear();
+                List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
+                foreach (string role in model.Roles)
+                {
+                    Role? existing = existRoles.SingleOrDefault(r => r.Title == role);
+                    user.Roles.Add(existing ?? new Role { Title = role });
+                }
+            }
+
+            if (model.Avatar is not null)
+            {
+                // remove old image
+                WorkWithImages.RemoveImage(user.Avatar, "avatars");
+
+                string imageName = Guid.NewGuid().ToString("N");
+                string imageExt = Path.GetExtension(model.Avatar.FileName);
+                model.Avatar.SaveImage(imageName, imageExt, "avatars");
+
+                user.Avatar = imageName + imageExt;
+            }
+
+            await _uow.SaveChangesAsync();
+
+            return Ok(new
+            {
+                user.Id,
+                user.UserName,
+                user.FullName,
+                user.Avatar,
+                Roles = user.Roles.Select(r => r.Title).ToList()
+            });
+        }
+
+        // DELETE api/<UserController>/5
+        [HttpDelete("{id}")]
             public async Task<IActionResult> Delete(int id)
             {
                 User user = await _userService.FindByIdAsync(id);
