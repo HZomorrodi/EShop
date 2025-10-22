@@ -1,129 +1,169 @@
-﻿    using EShop.Common.Extensions;
-    using EShop.DataLayer.Context;
-    using EShop.Entities;
-    using EShop.Entities.WebApi;
-    using EShop.Services.Contracts.Identity.WebApi;
-    using EShop.ViewModels.Users.WebApi;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Threading.Tasks;
+﻿using EShop.Common.Extensions;
+using EShop.DataLayer.Context;
+using EShop.Entities;
+using EShop.Entities.WebApi;
+using EShop.Services.Contracts.Identity.WebApi;
+using EShop.ViewModels.Users.WebApi;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
-    // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-    namespace Ticket.WebApi.Controllers
+namespace Ticket.WebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize(Roles = "Admin")]
+    public class UserController(IUserService userService, IRoleService roleService, IUnitOfWork uow) : ControllerBase
     {
-        [Route("api/[controller]")]
-        [ApiController]
-        [Authorize(Roles = "Admin")]
-        public class UserController(IUserService userService, IRoleService roleService, IUnitOfWork uow) : ControllerBase
+        private readonly IUserService _userService = userService;
+        private readonly IRoleService _roleService = roleService;
+        private readonly IUnitOfWork _uow = uow;
+
+        // GET: api/<UserController>
+        [HttpGet]
+        public async Task<IActionResult> Get()
         {
-            private readonly IUserService _userService = userService;
-            private readonly IRoleService _roleService = roleService;
-            private readonly IUnitOfWork _uow = uow;
+            List<User> users = await _userService.GetAllAsync();
+            return Ok(users);
+        }
 
-            // GET: api/<UserController>
-            [HttpGet]
-            public async Task<IActionResult> Get()
+        // GET api/<UserController>/5
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            User user = await _userService.FindByIdAsync(id);
+            return Ok(user);
+        }
+
+        // POST api/<UserController>
+        [HttpPost]
+        public async Task<IActionResult> Post([FromForm] AddUserViewModel model)
+        {
+            bool duplicate = _userService.IsExistsByUserNameForAdd(model.UserName);
+            if (duplicate)
             {
-                List<User> users = await _userService.GetAllAsync();
-                return Ok(users);
+                return BadRequest("نام کاربری تکراری میباشد");
             }
-
-            // GET api/<UserController>/5
-            [HttpGet("{id}")]
-            public async Task<IActionResult> Get(int id)
+            User user = new()
             {
-                User user = await _userService.FindByIdAsync(id);
-                return Ok(user);
-            }
-
-            // POST api/<UserController>
-            [HttpPost]
-            public async Task<IActionResult> Post([FromForm] AddUserViewModel model)
+                UserName = model.UserName,
+                FullName = model.FullName,
+                PassWord = model.Password.ToHash(),
+            };
+            if (model.Roles?.Count > 0)
             {
-                bool duplicate = _userService.IsExistsByUserNameForAdd(model.UserName);
-                if (duplicate)
+                List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
+                model.Roles.ForEach(role =>
                 {
-                    return BadRequest("نام کاربری تکراری میباشد");
-                }
-                User user = new()
-                {
-                    UserName = model.UserName,
-                    FullName = model.FullName,
-                    PassWord = model.Password.ToHash(),
-                };
-                if (model.Roles?.Count > 0)
-                {
-                    List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
-                    model.Roles.ForEach(role =>
-                    {
-                        Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
-                        user.Roles.Add(currentRole ?? new Role { Title = role });
-                    });
-                }
-                //upload image
-                string avatarName = Guid.NewGuid().ToString("N");
-                string avatarExtension = Path.GetExtension(model.Avatar.FileName);
-                model.Avatar.SaveImage(avatarName, avatarExtension, "avatars");
-                user.Avatar = avatarName + avatarExtension;
-                //
-                await _userService.AddAsync(user);
-                await _uow.SaveChangesAsync();
-                return CreatedAtAction(nameof(Get), new { user.Id }, new
-                {
-                    user.Id,
-                    model.UserName,
-                    model.FullName,
-                    Password = model.Password.ToHash(),
-                    user.Avatar,
-                    Roles = user.Roles.Select(role => role.Title).ToList()
+                    Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
+                    user.Roles.Add(currentRole ?? new Role { Title = role });
                 });
             }
-
-            // PUT api/<UserController>/5
-            [HttpPut("{id}")]
-            public async Task<IActionResult> PutAsync(int id, [FromForm] AddUserViewModel model)
+            //upload image
+            string avatarName = Guid.NewGuid().ToString("N");
+            string avatarExtension = Path.GetExtension(model.Avatar.FileName);
+            model.Avatar.SaveImage(avatarName, avatarExtension, "avatars");
+            user.Avatar = avatarName + avatarExtension;
+            //
+            await _userService.AddAsync(user);
+            await _uow.SaveChangesAsync();
+            return CreatedAtAction(nameof(Get), new { user.Id }, new
             {
-                User? user = await _userService.GetUserToEdit(id);
-                if (user is null)
-                {
-                    return BadRequest();
-                }
-                bool checkForDuplicateUserName = _userService.IsExistsByUserNameForEdit(model.UserName, id);
-                if (checkForDuplicateUserName)
-                {
-                    return BadRequest("نام کاربری تکراری میباشد");
-                }
+                user.Id,
+                model.UserName,
+                model.FullName,
+                Password = model.Password.ToHash(),
+                user.Avatar,
+                Roles = user.Roles.Select(role => role.Title).ToList()
+            });
+        }
 
-                user.UserName = model.UserName;
-                user.FullName = model.FullName;
-                user.PassWord = model.Password.ToHash();
-                user.Roles.Clear();
-                if (model.Roles?.Count > 0)
+        [HttpPost("Base64")]
+        public async Task<IActionResult> Post(AddUserViewModelBase64 model)
+        {
+            bool duplicate = _userService.IsExistsByUserNameForAdd(model.UserName);
+            if (duplicate)
+            {
+                return BadRequest("نام کاربری تکراری میباشد");
+            }
+            User user = new()
+            {
+                UserName = model.UserName,
+                FullName = model.FullName,
+                PassWord = model.Password.ToHash(),
+            };
+            if (model.Roles?.Count > 0)
+            {
+                List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
+                model.Roles.ForEach(role =>
                 {
-                    List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
-                    model.Roles.ForEach(role =>
-                    {
-                        Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
-                        user.Roles.Add(currentRole ?? new Role { Title = role });
-                    });
-                }
-                WorkWithImages.RemoveImage(user.Avatar, "avatars");
-                var imageExtension = Path.GetExtension(model.Avatar.FileName);
-                var imageName = Guid.NewGuid().ToString("N");
-                model.Avatar.SaveImage(imageName, imageExtension, "avatars");
-                user.Avatar = imageName + imageExtension;
-                await _uow.SaveChangesAsync();
-                return Ok(new
-                {
-                    user.Id,
-                    model.UserName,
-                    model.FullName,
-                    Password = model.Password.ToHash(),
-                    user.Avatar,
-                    Roles = user.Roles.Select(role => role.Title).ToList()
+                    Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
+                    user.Roles.Add(currentRole ?? new Role { Title = role });
                 });
             }
+            //upload image
+            string avatarName = Guid.NewGuid().ToString("N");
+            string avatarExtension = model.Avatar.SaveBase64Image(avatarName, "avatars");
+            user.Avatar = avatarName + avatarExtension;
+            //
+            await _userService.AddAsync(user);
+            await _uow.SaveChangesAsync();
+            return CreatedAtAction(nameof(Get), new { user.Id }, new
+            {
+                user.Id,
+                model.UserName,
+                model.FullName,
+                Password = model.Password.ToHash(),
+                user.Avatar,
+                Roles = user.Roles.Select(role => role.Title).ToList()
+            });
+        }
+        // PUT api/<UserController>/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAsync(int id, [FromForm] AddUserViewModel model)
+        {
+            User? user = await _userService.GetUserToEdit(id);
+            if (user is null)
+            {
+                return BadRequest();
+            }
+            bool checkForDuplicateUserName = _userService.IsExistsByUserNameForEdit(model.UserName, id);
+            if (checkForDuplicateUserName)
+            {
+                return BadRequest("نام کاربری تکراری میباشد");
+            }
+
+            user.UserName = model.UserName;
+            user.FullName = model.FullName;
+            user.PassWord = model.Password.ToHash();
+            user.Roles.Clear();
+            if (model.Roles?.Count > 0)
+            {
+                List<Role> existRoles = _roleService.GetRolesBy(model.Roles);
+                model.Roles.ForEach(role =>
+                {
+                    Role? currentRole = existRoles.SingleOrDefault(existRole => existRole.Title == role);
+                    user.Roles.Add(currentRole ?? new Role { Title = role });
+                });
+            }
+            WorkWithImages.RemoveImage(user.Avatar, "avatars");
+            var imageExtension = Path.GetExtension(model.Avatar.FileName);
+            var imageName = Guid.NewGuid().ToString("N");
+            model.Avatar.SaveImage(imageName, imageExtension, "avatars");
+            user.Avatar = imageName + imageExtension;
+            await _uow.SaveChangesAsync();
+            return Ok(new
+            {
+                user.Id,
+                model.UserName,
+                model.FullName,
+                Password = model.Password.ToHash(),
+                user.Avatar,
+                Roles = user.Roles.Select(role => role.Title).ToList()
+            });
+        }
 
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchAsync(int id, [FromForm] PatchUserViewModel model)
@@ -186,17 +226,17 @@
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-            public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
+        {
+            User user = await _userService.FindByIdAsync(id);
+            if (user is null)
             {
-                User user = await _userService.FindByIdAsync(id);
-                if (user is null)
-                {
-                    return BadRequest();
-                }
-                _userService.Remove(user);
-                await _uow.SaveChangesAsync();
-                return Ok();
+                return BadRequest();
             }
-       
+            _userService.Remove(user);
+            await _uow.SaveChangesAsync();
+            return Ok();
+        }
+
     }
-    }
+}

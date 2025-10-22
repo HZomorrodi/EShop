@@ -1,5 +1,4 @@
 ﻿using EShop.Common.Constants;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,18 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EShop.ViewModels.Users.WebApi
+namespace EShop.ViewModels.TestWebApi
 {
-    public class AddUserViewModelBase64
+    public class ShowUserViewModel
     {
+        [Display(Name = "نام کاربری")]
         public string UserName { get; set; }
-
+        [Display(Name = "نام و نام خانوادگی")]
         public string FullName { get; set; }
-
-        public string Password { get; set; }
-
-        public List<string>? Roles { get; set; }
-
+        [Display(Name = "عکس کاربر")]
         public string Avatar { get; set; }
     }
 }
