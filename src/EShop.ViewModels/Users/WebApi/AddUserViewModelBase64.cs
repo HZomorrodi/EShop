@@ -11,6 +11,8 @@ namespace EShop.ViewModels.Users.WebApi
 {
     public class AddUserViewModelBase64
     {
+        [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
+        [MaxLength(100, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)] 
         public string UserName { get; set; }
 
         public string FullName { get; set; }

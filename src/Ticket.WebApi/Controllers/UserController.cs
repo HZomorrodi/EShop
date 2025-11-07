@@ -86,7 +86,11 @@ namespace Ticket.WebApi.Controllers
             bool duplicate = _userService.IsExistsByUserNameForAdd(model.UserName);
             if (duplicate)
             {
-                return BadRequest("نام کاربری تکراری میباشد");
+                return BadRequest(new
+                {
+                    Code = 10,
+                    Message = "نام کاربری تکراری می‌باشد"
+                });
             }
             User user = new()
             {

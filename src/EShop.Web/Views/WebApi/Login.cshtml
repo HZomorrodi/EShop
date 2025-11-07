@@ -42,4 +42,27 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $("form").submit(function (e) {
+            e.preventDefault(); // stop normal form submission
+            var form = $(this);
+            var formData = form.serialize(); // includes all inputs + antiforgery token
+            $.ajax({
+                url: '/WebApi/Login', // adjust to your endpoint
+                type: "POST",
+                data: formData,
+                success: function (res) {
+                    if(res.result) {
+                        location.href = '/WebApi' 
+                    }
+                    else{
+                        alert(res.message);
+                    }
+                },
+                error: function (xhr) {
+                    alert("Error: " + xhr.responseText);
+                }
+            });
+        });
+    </script>
 }

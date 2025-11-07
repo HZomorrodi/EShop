@@ -1,24 +1,26 @@
-﻿using EShop.DataLayer.Context;
+﻿using EShop.Common.Mvc;
+using EShop.DataLayer.Context;
+using EShop.Entities.Identity;
+using EShop.Services;
 using EShop.Services.Contracts;
+using EShop.Services.Contracts.Identity;
+using EShop.Services.Contracts.WebApi;
 using EShop.Services.EFServices;
+using EShop.Services.EFServices.Identity;
+using EShop.Services.EFServices.WebApi;
 using EShop.ViewModels.App;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using EShop.Common.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using EShop.Services;
-using EShop.Entities.Identity;
-using EShop.Services.EFServices.Identity;
-using EShop.Services.Contracts.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace EShop.IocConfig
 {
     public static class AddCustomServicesExtensions
@@ -61,7 +63,9 @@ namespace EShop.IocConfig
             services.AddScoped<ICartDetailService, CartDetailService>();    
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
-            services.AddHttpClient();
+            services.AddScoped<ICookieManager, CookieManager>();
+            services.AddScoped<IUserServiceWebApi, UserServiceWebApi>();
+            services.AddScoped<IHttpClientService, HttpClientService>();
 
             services.AddIdentity<User, Role>(setupAction).
                 //AddEntityFrameworkStores<EShopDbContext>().

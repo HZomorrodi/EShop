@@ -27,6 +27,6 @@ namespace EShop.ViewModels.TestWebApi
 
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         public IFormFile UserAvatar { get; set; }
-        public string Avatar { get; set; }
+        public string? Avatar { get; set; }
     }
 }

@@ -1,91 +1,110 @@
-﻿using EShop.ViewModels.TestWebApi;
+﻿using EShop.Common.Constants;
+using EShop.Common.Extensions;
+using EShop.Services.Contracts;
+using EShop.Services.Contracts.WebApi;
+using EShop.ViewModels.TestWebApi;
+using EShop.Web.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Mime;
-using EShop.Common.Extensions;
 using System.Threading.Tasks;
 
 namespace EShop.Web.Controllers
 {
-    public class WebApiController : Controller
+    [TypeFilter(typeof(CustomAuthorize))]
+    public class WebApiController(ICookieManager cookieManager, IUserServiceWebApi userServiceWebApi) : Controller
     {
+        private readonly ICookieManager _cookieManager = cookieManager;
+        private readonly IUserServiceWebApi _userServiceWebApi = userServiceWebApi;
+
         public async Task<IActionResult> IndexAsync()
         {
-            HttpClient client = new();
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiUGF5YW0iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiQWRtaW4iLCJDdXN0b21lciJdLCJleHAiOjE3Njg5MzI1OTUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcxOTgiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MTk4In0.6tXCSvjULTSa6ZgNI7T7WiQCL-1FTcYExYjx1MmgQNs"); 
-            HttpRequestMessage request = new()
+            OperationResult<List<ShowUserViewModel?>> result = await _userServiceWebApi.GetAllUserAsync();
+            if (!result.IsSuccess)
             {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("https://localhost:7198/api/User"),
-                Content = new StringContent(string.Empty, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json)
-            };
-            HttpResponseMessage result = await client.SendAsync(request);
-            if (result.StatusCode != System.Net.HttpStatusCode.OK)
-            {
-                return View("Error");
+                return View("Error2");
             }
-            string responseBody = await result.Content.ReadAsStringAsync();
-            List<ShowUserViewModel>? users = JsonConvert.DeserializeObject<List<ShowUserViewModel>>(responseBody);
-            return View(users);
+            return View(result.Result);
         }
         public IActionResult Add()
         {
             return View();
         }
-        [HttpPost]
+
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> AddAsync(AddUserViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", PublicConstantStrings.ModelStateErrorMessage);
+                return View(model);
+            }
             model.Avatar = await model.UserAvatar.ConvertToBase64();
             model.UserAvatar = null;
-            HttpClient client = new();
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiUGF5YW0iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOlsiQWRtaW4iLCJDdXN0b21lciJdLCJleHAiOjE3Njg5MzI1OTUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcxOTgiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MTk4In0.6tXCSvjULTSa6ZgNI7T7WiQCL-1FTcYExYjx1MmgQNs");
-            string modelInJson = JsonConvert.SerializeObject(model);
-            HttpRequestMessage request = new()
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("https://localhost:7198/api/User/Base64"),
-                Content = new StringContent(modelInJson, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json)
-            };
-            HttpResponseMessage result = await client.SendAsync(request);
-            if (result.StatusCode != System.Net.HttpStatusCode.Created)
+            var result = await _userServiceWebApi.AddAsync(model);
+
+            if (!result.IsSuccess)
             {
                 ModelState.AddModelError("", "نام کاربری تکراری است");
                 return View(model);
             }
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
         }
+
         [HttpPost, ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            HttpClient client = new();
-            string modelInJson = JsonConvert.SerializeObject(model);
-            HttpRequestMessage request = new()
+            if (!ModelState.IsValid)
             {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("https://localhost:7198/api/Account/login"),
-                Content = new StringContent(modelInJson, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json)
-            };
-            HttpResponseMessage result = await client.SendAsync(request);
-            if (!result.IsSuccessStatusCode)
+                return Json(new
+                {
+                    result = false,
+                    message = PublicConstantStrings.ModelStateErrorMessage
+                });
+            }
+            OperationResult<string> result = await _userServiceWebApi.Login(model);
+            if (!result.IsSuccess)
             {
                 return Json(new
                 {
                     result = false,
                     message = "نام کاربری یا رمز عبور اشتباه است"
-                }
-                );
+                });
             }
             else
             {
+                _cookieManager.Add("JWTToken", result.Result.Trim('"'));
                 return Json(new
                 {
                     result = true
                 });
             }
         }
+    }
+}
+public class CodesMessage
+{
+    public const int DuplicateUserName = 10;
+
+    public string GetMessage(int code)
+    {
+        var result = string.Empty;
+        if (code == 10)
+        {
+            result = "نام کاربری تکراری است";
+        }
+        else if (code == 11)
+        {
+
+        }
+
+        return result;
     }
 }
