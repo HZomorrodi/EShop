@@ -8,13 +8,10 @@ using System.Threading.Tasks;
 
 namespace EShop.Services
 {
-    public class HttpClientService : IHttpClientService
+    public class HttpClientService(HttpClient httpClient) : IHttpClientService
     {
-        private readonly HttpClient _httpClient;
-        public HttpClientService()
-        {
-            _httpClient = new();
-        }
+        private readonly HttpClient _httpClient = httpClient;
+
         public async Task<HttpResponseMessage> SendAsync(string url, HttpMethod method, string? authorizationToken = null, string content = "", string mediaType = MediaTypeNames.Application.Json)
         {
             if (!string.IsNullOrWhiteSpace(authorizationToken))

@@ -1,4 +1,6 @@
-﻿using EShop.Common.Constants;
+﻿using EShop.Common;
+using EShop.Common.Attributes;
+using EShop.Common.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -56,6 +58,10 @@ namespace EShop.ViewModels.Account
         ErrorMessage = "لطفا تنها از حروف فارسی استفاده نمائید")]
         public string? LastName { get; set; }
         [DisplayName("آواتار")]
+        [FileRequired("آواتار")]
+        //[AllowExtensions("آواتار", ["png", "jpg"], ["image/jpeg", "image/png"])]
+        [IsImage("آواتار")]
+        [MaxFileSize("آواتار", 2)]
         public IFormFile? Avatar { get; set; }
     }
 }

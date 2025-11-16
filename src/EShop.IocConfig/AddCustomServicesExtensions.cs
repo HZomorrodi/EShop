@@ -65,7 +65,13 @@ namespace EShop.IocConfig
             services.AddScoped<IEmailSenderService, EmailSenderService>();
             services.AddScoped<ICookieManager, CookieManager>();
             services.AddScoped<IUserServiceWebApi, UserServiceWebApi>();
-            services.AddScoped<IHttpClientService, HttpClientService>();
+            services.AddHttpClient<IHttpClientService, HttpClientService>(client =>
+            {
+                // Configure the HttpClient
+                client.BaseAddress = new Uri("https://localhost:7002/");
+                client.Timeout = TimeSpan.FromSeconds(30);
+                client.DefaultRequestHeaders.Add("User-Agent", "EShop-App");
+            });
 
             services.AddIdentity<User, Role>(setupAction).
                 //AddEntityFrameworkStores<EShopDbContext>().
