@@ -78,8 +78,8 @@ namespace EShop.Services.EFServices
 
         public IQueryable<Product> GetProductQuery()
         {
-         return   _products.AsQueryable();
-            
+            return _products.AsQueryable();
+
         }
         public async Task<EditProductViewModel?> GetProductToEdit(int id)
         {
@@ -95,12 +95,13 @@ namespace EShop.Services.EFServices
                     CategoryChildrenId = p.CategoryId,
                     ProductImages = p.ProductImages.Select(i => i.Title).ToList(),
                     Properties = p.ProductProperties.Select(p => $"{p.Title} ||| {p.Value}").ToList(),
+                    SelectedTags = string.Join(",", p.ProductProductTags.Select(x => x.ProductTag.Title))
                 }).SingleOrDefaultAsync();
         }
 
         public async Task<Product?> GetProductToUpdateAsync(int id)
         {
-            return await _products
+            return await _products.Include(p => p.ProductProductTags)
                 .Where(p => p.Id == id)
                 .Include(p => p.ProductImages)
                 .Include(p => p.ProductProperties)
@@ -132,6 +133,7 @@ namespace EShop.Services.EFServices
                           CategoryTitle = p.Category.Title,
                           Images = p.ProductImages.Select(i => i.Title).ToList(),
                           Properties = p.ProductProperties.Select(i => $"{i.Title} ||| {i.Value}").ToList(),
+                          Tags = p.ProductProductTags.Select(p => p.ProductTag.Title).ToList(),
                       }).SingleOrDefaultAsync();
         }
         public async Task<List<ProductPreviewViewModel>> GetNewestProductAsync(int? excludeId = null, int take = 8)
@@ -186,6 +188,6 @@ namespace EShop.Services.EFServices
             Title = x.Title
         }).ToListAsync();
 
-     
+
     }
 }

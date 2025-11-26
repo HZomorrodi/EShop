@@ -26,6 +26,7 @@ namespace EShop.Entities
         public virtual ICollection<CartDetail> CartDetails { get; set; } = [];
         public virtual ICollection<ProductImage> ProductImages { get; set; } = [];
         public virtual ICollection<ProductProperty> ProductProperties { get; set; } = [];
+        public virtual ICollection<ProductProductTag> ProductProductTags { get; set; } = [];
         #endregion
 
     }

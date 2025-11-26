@@ -3,8 +3,11 @@ using EShop.IocConfig;
 using EShop.ViewModels.App;
 using EShop.ViewModels.Application;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.WebEncoders;
 using NLog;
 using NLog.Web;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 // Early init of NLog to allow startup and exception logging, before host is built
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("init main");
@@ -14,7 +17,10 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddRazorPages();
-
+    builder.Services.Configure<WebEncoderOptions>(options =>
+    {
+        options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All);
+    });
     // Add services to the container.
     builder.Services.Configure<ConnectionStringsModel>(builder.Configuration.GetSection("ConnectionStrings"));
     builder.Services.Configure<EmailConfigsModel>(builder.Configuration.GetSection("EmailConfigs"));

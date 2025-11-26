@@ -39,5 +39,8 @@ namespace EShop.ViewModels.Products
         [Display(Name = "ویژگی های محصول")]
         public List<string> Properties { get; set; } = [];
 
+        [Display(Name = "کلمات کلیدی")]
+        public string Tags { get; set; }
+
     }
 }

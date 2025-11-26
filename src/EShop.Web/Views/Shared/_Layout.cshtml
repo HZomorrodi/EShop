@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EShop.Web.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Tags", required: false)
     @await RenderSectionAsync("Csss", required: false)
 </head>
 <body>

@@ -4,6 +4,7 @@ using EShop.DataLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.DataLayer.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    partial class EShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251123035439_Product2Id5")]
+    partial class Product2Id5
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,13 +383,13 @@ namespace EShop.DataLayer.Migrations
 
             modelBuilder.Entity("EShop.Entities.ProductProductTag", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<int>("Product2Id")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductTagId")
                         .HasColumnType("int");
 
-                    b.HasKey("ProductId", "ProductTagId");
+                    b.HasKey("Product2Id", "ProductTagId");
 
                     b.HasIndex("ProductTagId");
 
@@ -636,7 +639,7 @@ namespace EShop.DataLayer.Migrations
                 {
                     b.HasOne("EShop.Entities.Product", "Product")
                         .WithMany("ProductProductTags")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("Product2Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

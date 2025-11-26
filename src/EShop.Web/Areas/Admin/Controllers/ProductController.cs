@@ -2,13 +2,16 @@
 using EShop.Common.Constants;
 using EShop.Common.Extensions;
 using EShop.DataLayer.Context;
+using EShop.DataLayer.Migrations;
 using EShop.Entities;
 using EShop.Services.Contracts;
 using EShop.Services.EFServices;
 using EShop.ViewModels.Categories;
 using EShop.ViewModels.Products;
+using EShop.ViewModels.ProductTags;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -16,11 +19,13 @@ namespace EShop.Web.Areas.Admin.Controllers
 {
     [Area(AreaConstants.AdminArea)]
     public class ProductController(IProductService productService,
+                                   IProductTagService productTagService,
                                    ICategoryService categoryService,
                                    IProductImageService productImageService,
                                    IUnitOfWork uow) : BaseController
     {
         private readonly IProductService productService = productService;
+        private readonly IProductTagService productTagService = productTagService;
         private readonly ICategoryService categoryService = categoryService;
         private readonly IProductImageService productImageService = productImageService;
         private readonly IUnitOfWork uow = uow;
@@ -47,6 +52,19 @@ namespace EShop.Web.Areas.Admin.Controllers
                 ViewBag.MainCategories = categories.ToList().CreateSelectListItem(addChooseOneItem: false, selectedItem: model.CategoryId);
                 return View(model);
             }
+            List<string>? productTags = [];
+            if (model.Tags is not null)
+            {
+                List<TagifyValueViewModel>? convertedTags = JsonConvert.DeserializeObject<List<TagifyValueViewModel>>(model.Tags);
+                productTags = convertedTags?.Where(x => x.Value is not null)
+                   .Select(x => x.Value.Trim())
+                   .Distinct()
+                   .ToList();
+                if (productTags.Count > 10 || productTags.Any(x => x.Length > 100))
+                {
+                    return View("Error2");
+                }
+            }
             Product product = new()
             {
                 CategoryId = model.CategoryChildrenId,
@@ -71,6 +89,15 @@ namespace EShop.Web.Areas.Admin.Controllers
                 product.ProductImages.Add(new ProductImage
                 {
                     Title = imageName + imageExtension,
+                });
+            }
+            if (productTags?.Count > 0)
+            {
+                List<Entities.ProductTag> tags = productTagService.GetTags(productTags);
+                productTags.ForEach(productTag =>
+                {
+                    Entities.ProductTag? addedTag = tags.SingleOrDefault(tag => tag.Title == productTag);
+                    product.ProductProductTags.Add(new ProductProductTag { ProductTag = addedTag ?? new Entities.ProductTag { Title = productTag } });
                 });
             }
             await productService.AddAsync(product);
@@ -99,8 +126,20 @@ namespace EShop.Web.Areas.Admin.Controllers
                 ViewBag.MainCategories = categories.ToList().CreateSelectListItem(addChooseOneItem: false, selectedItem: model.CategoryId);
                 return View(model);
             }
+            List<string>? productTags = [];
+            if (model.SelectedTags is not null)
+            {
+                List<TagifyValueViewModel>? convertedTags = JsonConvert.DeserializeObject<List<TagifyValueViewModel>>(model.SelectedTags);
+                productTags = convertedTags?.Where(x => x.Value is not null)
+                   .Select(x => x.Value.Trim())
+                   .Distinct()
+                   .ToList();
+                if (productTags.Count > 10 || productTags.Any(x => x.Length > 100))
+                {
+                    return View("Error2");
+                }
+            }
             Product? product = await productService.GetProductToUpdateAsync(id);
-
             if (product?.ProductImages.Count == 0 && model?.Images?.Count == 0)
             {
                 ModelState.AddModelError(nameof(EditProductViewModel.Images), "لطفا حداقل یک عکس را برای محصول انتخاب کنید");
@@ -132,6 +171,16 @@ namespace EShop.Web.Areas.Admin.Controllers
                 product.ProductImages.Add(new ProductImage
                 {
                     Title = imageName + imageExtension,
+                });
+            }
+            product.ProductProductTags.Clear();
+            if (productTags?.Count > 0)
+            {
+                List<Entities.ProductTag> tags = productTagService.GetTags(productTags);
+                productTags.ForEach(productTag =>
+                {
+                    Entities.ProductTag? addedTag = tags.SingleOrDefault(tag => tag.Title == productTag);
+                    product.ProductProductTags.Add(new ProductProductTag { ProductTag = addedTag ?? new Entities.ProductTag { Title = productTag } });
                 });
             }
             productService.Update(product);

@@ -4,7 +4,12 @@
 @{
 	ViewData["Title"] = $"جزییات محصول {Model.Title}";
 }
-
+@section Tags {
+	@if (Model.Tags != null)
+	{
+		<meta name="keywords" content="@string.Join(",", Model.Tags)" />
+	}
+}
 <div class="container">
 	<div class="row">
 		<div class="col-md-4">

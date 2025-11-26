@@ -4,6 +4,7 @@ using EShop.DataLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.DataLayer.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    partial class EShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251122171343_Product2Id3")]
+    partial class Product2Id3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,13 +383,18 @@ namespace EShop.DataLayer.Migrations
 
             modelBuilder.Entity("EShop.Entities.ProductProductTag", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<int>("ProductzId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductTagId")
                         .HasColumnType("int");
 
-                    b.HasKey("ProductId", "ProductTagId");
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductzId", "ProductTagId");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("ProductTagId");
 

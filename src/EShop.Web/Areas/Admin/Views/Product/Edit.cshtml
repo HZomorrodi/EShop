@@ -40,6 +40,13 @@
                 <select asp-for="CategoryChildrenId" class="form-control" id="category-children-element"></select>
                 <span asp-validation-for="CategoryChildrenId" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="SelectedTags" class="control-label"></label>
+                <input asp-for="SelectedTags" class="form-control" placeholder="کلمه کلیدی + اینتر" />
+                <div id="emailHelp" class="form-text">
+                    حداکثر 10 کلمه کلیدی و هر کلمه حداکثر 100 کاراکتر
+                </div>
+            </div>
             <div class="form-group" id="product-images-place">
                 <label asp-for="Images" class="control-label"></label>
                 <input asp-for="Images" class="form-control" accept="image/*" id="file-input" />
@@ -84,11 +91,19 @@
         </form>
     </div>
 </div>
-
+@section Csss {
+    <link rel="stylesheet" href="~/lib/tagify/tagify.css" />
+}
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script src="~/lib/ckeditor/ckeditor.js"></script>
+    <script src="~/lib/tagify/tagify.min.js"></script>
     <script>
+        var input = document.getElementById('SelectedTags');
+        var tagify = new Tagify(input, {
+            pattern: /^.{1,100}$/,
+            maxTags: 10
+        });
         $(function() {
             // CKEditor Initialization
             CKEDITOR.replace('product-description', {

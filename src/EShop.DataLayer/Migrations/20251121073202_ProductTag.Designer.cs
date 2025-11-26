@@ -4,6 +4,7 @@ using EShop.DataLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EShop.DataLayer.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    partial class EShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251121073202_ProductTag")]
+    partial class ProductTag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -378,21 +381,6 @@ namespace EShop.DataLayer.Migrations
                     b.ToTable("ProductImage");
                 });
 
-            modelBuilder.Entity("EShop.Entities.ProductProductTag", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductTagId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductId", "ProductTagId");
-
-                    b.HasIndex("ProductTagId");
-
-                    b.ToTable("ProductsProductTags", (string)null);
-                });
-
             modelBuilder.Entity("EShop.Entities.ProductProperty", b =>
                 {
                     b.Property<int>("Id")
@@ -436,10 +424,7 @@ namespace EShop.DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Title")
-                        .IsUnique();
-
-                    b.ToTable("ProductTags");
+                    b.ToTable("ProductTag");
                 });
 
             modelBuilder.Entity("EShop.Entities.Slider", b =>
@@ -506,6 +491,21 @@ namespace EShop.DataLayer.Migrations
                         .IsUnique();
 
                     b.ToTable("UserInformation");
+                });
+
+            modelBuilder.Entity("ProductProductTag", b =>
+                {
+                    b.Property<int>("ProductTagsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductTagsId", "ProductsId");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("ProductProductTag");
                 });
 
             modelBuilder.Entity("EShop.Entities.Cart", b =>
@@ -632,25 +632,6 @@ namespace EShop.DataLayer.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("EShop.Entities.ProductProductTag", b =>
-                {
-                    b.HasOne("EShop.Entities.Product", "Product")
-                        .WithMany("ProductProductTags")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EShop.Entities.ProductTag", "ProductTag")
-                        .WithMany("ProductProductTags")
-                        .HasForeignKey("ProductTagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("ProductTag");
-                });
-
             modelBuilder.Entity("EShop.Entities.ProductProperty", b =>
                 {
                     b.HasOne("EShop.Entities.Product", "Product")
@@ -682,6 +663,21 @@ namespace EShop.DataLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProductProductTag", b =>
+                {
+                    b.HasOne("EShop.Entities.ProductTag", null)
+                        .WithMany()
+                        .HasForeignKey("ProductTagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EShop.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EShop.Entities.Cart", b =>
@@ -723,14 +719,7 @@ namespace EShop.DataLayer.Migrations
 
                     b.Navigation("ProductImages");
 
-                    b.Navigation("ProductProductTags");
-
                     b.Navigation("ProductProperties");
-                });
-
-            modelBuilder.Entity("EShop.Entities.ProductTag", b =>
-                {
-                    b.Navigation("ProductProductTags");
                 });
 #pragma warning restore 612, 618
         }
