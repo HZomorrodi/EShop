@@ -9,6 +9,7 @@ using EShop.Services.EFServices;
 using EShop.Services.EFServices.Identity;
 using EShop.Services.EFServices.WebApi;
 using EShop.ViewModels.App;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -89,6 +90,10 @@ namespace EShop.IocConfig
                 Options.ClientId = "860741161447-12k9seic3pgpi6gadj5f8t2115d39r5v.apps.googleusercontent.com";
             });
             services.AddRazorViewRenderer();
+            #region Html sanitizer
+            IHtmlSanitizer sanitizer = new HtmlSanitizer();
+            services.AddSingleton(sanitizer);
+            #endregion
             return services;
         }
 

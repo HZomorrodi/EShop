@@ -9,6 +9,7 @@ using EShop.Services.EFServices;
 using EShop.ViewModels.Categories;
 using EShop.ViewModels.Products;
 using EShop.ViewModels.ProductTags;
+using Ganss.Xss;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -22,13 +23,15 @@ namespace EShop.Web.Areas.Admin.Controllers
                                    IProductTagService productTagService,
                                    ICategoryService categoryService,
                                    IProductImageService productImageService,
-                                   IUnitOfWork uow) : BaseController
+                                   IUnitOfWork uow,
+                                   IHtmlSanitizer htmlSanitizer) : BaseController
     {
         private readonly IProductService productService = productService;
         private readonly IProductTagService productTagService = productTagService;
         private readonly ICategoryService categoryService = categoryService;
         private readonly IProductImageService productImageService = productImageService;
         private readonly IUnitOfWork uow = uow;
+        private readonly IHtmlSanitizer htmlSanitizer = htmlSanitizer;
         public ActionResult Index()
         {
             return View(productService.GetProductsPreview());
@@ -150,7 +153,8 @@ namespace EShop.Web.Areas.Admin.Controllers
             product.CategoryId = model.CategoryChildrenId;
             product.Title = model.Title;
             product.Price = model.Price;
-            product.Description = model.Description;
+            //product.Description = model.Description;
+            product.Description = htmlSanitizer.Sanitize(model.Description);
 
             product.ProductProperties.Clear();
             foreach (var property in model.Properties)
