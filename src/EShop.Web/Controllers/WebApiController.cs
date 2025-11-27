@@ -6,6 +6,7 @@ using EShop.ViewModels.TestWebApi;
 using EShop.Web.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -86,6 +87,47 @@ namespace EShop.Web.Controllers
                     result = true
                 });
             }
+        }
+
+        [AllowAnonymous]
+        public IActionResult Login2()
+        {
+            return View();
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login2(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("Error2");
+            }
+            SqlConnectionStringBuilder builder = new()
+            {
+                DataSource = ".",
+                InitialCatalog = "TicketDb",
+                IntegratedSecurity = true,
+                MultipleActiveResultSets = true,
+                TrustServerCertificate = true,
+            };
+            string commandText = $"SELECT TOP(1) * FROM Users WHERE [UserName] = N'{model.UserName}'" +
+                $" AND [Password] = N'{@model.Password}'";
+            string commandText2 = $"SELECT TOP(1) * FROM Users WHERE [UserName] = @UserName " +
+                $"AND [Password] = @Password";
+            using (SqlConnection connection = new(builder.ConnectionString))
+            using (SqlCommand command = new(commandText2, connection))
+            {
+                connection.Open();
+                command.Parameters.Add(new SqlParameter ("@UserName", model.UserName));
+                command.Parameters.Add(new SqlParameter("@Password", model.Password));
+                SqlDataReader results = command.ExecuteReader();
+                if (results.Read())
+                {
+                    var avatar = results["Avatar"];
+                }
+            }
+            return View();
         }
     }
 }
