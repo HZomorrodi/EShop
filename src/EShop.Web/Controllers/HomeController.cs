@@ -14,16 +14,24 @@ using System.Threading.Tasks;
 
 namespace EShop.Web.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, IProductService productService, ICategoryService categoryService, IUserManagerService userManager, IUnitOfWork uow) : Controller
+    public class HomeController(ILogger<HomeController> logger,
+                                IProductService productService,
+                                ICategoryService categoryService,
+                                IUserManagerService userManager,
+                                IUnitOfWork uow,
+                                IConfiguration configuration) : Controller
     {
         private readonly ILogger<HomeController> _logger = logger;
         public IProductService _productService { get; } = productService;
         private readonly ICategoryService categoryService = categoryService;
         private readonly IUserManagerService _userManager = userManager;
+        private readonly IConfiguration configuration = configuration;
+
         public IUnitOfWork _uow { get; } = uow;
 
         public async Task<IActionResult> Index()
         {
+            string? testValue = configuration["TestKey"];
             _logger.LogInformation("Hellow, this is the index!");
             _logger.LogWarning("Hellow, this is the index!");
             Entities.Identity.User? user = await _userManager.FindByIdAsync(1.ToString());
