@@ -26,6 +26,7 @@ namespace EShop.IocConfig
 {
     public static class AddCustomServicesExtensions
     {
+        public const string EmailConfirmationTokenProviderName = "ConfirmEmail";
         public static IServiceCollection AddCustomServices(this IServiceCollection services)
         {
             ServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -61,8 +62,8 @@ namespace EShop.IocConfig
             services.AddScoped<IProductImageService, ProductImageService>();
             services.AddScoped<IProductTagService, ProductTagService>();
             services.AddScoped<ISliderService, SliderService>();
-            services.AddScoped<ICartService, CartService>();    
-            services.AddScoped<ICartDetailService, CartDetailService>();    
+            services.AddScoped<ICartService, CartService>();
+            services.AddScoped<ICartDetailService, CartDetailService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IEmailSenderService, EmailSenderService>();
             services.AddScoped<ICookieManager, CookieManager>();
@@ -74,7 +75,7 @@ namespace EShop.IocConfig
                 client.Timeout = TimeSpan.FromSeconds(30);
                 client.DefaultRequestHeaders.Add("User-Agent", "EShop-App");
             });
-
+            services.AddConfirmEmailDataProtectorTokenOptions();
             services.AddIdentity<User, Role>(setupAction).
                 //AddEntityFrameworkStores<EShopDbContext>().
                 AddUserStore<UserStoreService>().
@@ -82,7 +83,8 @@ namespace EShop.IocConfig
                 AddUserManager<UserManagerService>().
                 AddRoleManager<RoleManagerService>().
                 AddSignInManager<SignInManagerService>().
-                AddDefaultTokenProviders();
+                AddDefaultTokenProviders().
+                AddTokenProvider<ConfirmEmailDataProtectorTokenProvider<User>>(EmailConfirmationTokenProviderName);
             services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
             services.AddAuthentication().AddGoogle(Options =>
             {
@@ -119,6 +121,15 @@ namespace EShop.IocConfig
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IViewRendererService, ViewRendererService>();
             return services;
+        }
+        private static void AddConfirmEmailDataProtectorTokenOptions(this IServiceCollection services)
+        {
+            services.Configure<IdentityOptions>(options =>
+            options.Tokens.EmailConfirmationTokenProvider = EmailConfirmationTokenProviderName);
+        
+            services.Configure<ConfirmEmailDataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromDays(3));
+
         }
     }
 }

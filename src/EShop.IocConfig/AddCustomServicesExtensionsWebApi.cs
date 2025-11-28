@@ -23,6 +23,7 @@ namespace EShop.IocConfig
 {
     public static class AddCustomServicesExtensionsWebApi
     {
+
         public static IServiceCollection AddCustomServicesWebApi(this IServiceCollection services)
         {
             ServiceProvider serviceProvider = services.BuildServiceProvider();
