@@ -5,6 +5,7 @@ using EShop.Services.Contracts.Identity;
 using EShop.Services.EFServices;
 using EShop.ViewModels.Products;
 using EShop.Web.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,19 +20,32 @@ namespace EShop.Web.Controllers
                                 ICategoryService categoryService,
                                 IUserManagerService userManager,
                                 IUnitOfWork uow,
+                                Services.Contracts.ICookieManager cookieManager,
                                 IConfiguration configuration) : Controller
     {
         private readonly ILogger<HomeController> _logger = logger;
-        public IProductService _productService { get; } = productService;
-        private readonly ICategoryService categoryService = categoryService;
+        public readonly IProductService _productService = productService;
+        private readonly ICategoryService _categoryService = categoryService;
         private readonly IUserManagerService _userManager = userManager;
-        private readonly IConfiguration configuration = configuration;
+        private readonly Services.Contracts.ICookieManager _cookieManager = cookieManager;
+        private readonly IConfiguration _configuration = configuration;
 
         public IUnitOfWork _uow { get; } = uow;
 
         public async Task<IActionResult> Index()
         {
-            string? testValue = configuration["TestKey"];
+            string? testValue = _configuration["TestKey"];
+            _cookieManager.Add("TestName", "Test Value", new CookieOptions
+            {
+                SameSite = SameSiteMode.Lax,
+                HttpOnly = true,
+                IsEssential = true,
+                Secure = true,
+                Path = "",
+                Domain = "",
+                Expires = DateTime.Now.AddDays(14),
+            }
+            );
             _logger.LogInformation("Hellow, this is the index!");
             _logger.LogWarning("Hellow, this is the index!");
             Entities.Identity.User? user = await _userManager.FindByIdAsync(1.ToString());
@@ -43,7 +57,7 @@ namespace EShop.Web.Controllers
                 NationalCode = "1",
             };
             //await _uow.SaveChangesAsync();
-            return View(await categoryService.GetAllFieldsAsync2());
+            return View(await _categoryService.GetAllFieldsAsync2());
         }
         public async Task<IActionResult> RemoveAsync()
         {
