@@ -44,5 +44,10 @@ namespace EShop.Services.EFServices.Identity
             int validItemCount = await _roles.CountAsync(r => SelectedRoles.Contains(r.Name));
             return SelectedRoles.Count == validItemCount;
         }
+
+        public Task<bool> IsRoleNameTakenAsync(int id, string name)
+        {
+            return _roles.AnyAsync(r => r.Name == name && r.Id != id);
+        }
     }
 }

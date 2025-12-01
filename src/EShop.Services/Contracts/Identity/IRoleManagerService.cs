@@ -20,6 +20,7 @@ public interface IRoleManagerService : IDisposable
     Task<IdentityResult> SetRoleNameAsync(Role role, string? name);
     Task<string> GetRoleIdAsync(Role role);
     Task<Role?> FindByNameAsync(string roleName);
+    Task<bool> IsRoleNameTakenAsync(int id, string name);
     Task<IdentityResult> AddClaimAsync(Role role, Claim claim);
     Task<IdentityResult> RemoveClaimAsync(Role role, Claim claim);
     Task<IList<Claim>> GetClaimsAsync(Role role);

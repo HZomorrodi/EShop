@@ -15,7 +15,8 @@ namespace EShop.ViewModels.Roles
         [Display(Name = "عنوان")]
         [Required(ErrorMessage = AttributesErrorMessages.RequiredErrorMessage)]
         [MaxLength(100, ErrorMessage = AttributesErrorMessages.MaxErrorMessage)]
-        [Remote("CheckRoleAccount", "Role", "Admin",
+        [Remote("CheckRoleAccountForEdit", "Role", "Admin",
+              AdditionalFields = ViewModelConstants.AntiForgeryToken + "," + nameof(Id),
               ErrorMessage = AttributesErrorMessages.RemoteErrorMessage, HttpMethod = "POST")]
         public string Name { get; set; }
     }

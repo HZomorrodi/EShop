@@ -27,6 +27,11 @@ namespace EShop.Web.Areas.Admin.Controllers
                 return Json(true);
             return Json(false);
         }
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckRoleAccountForEditAsync(int id, string name)
+        {
+            return Json(!await _roleManagerService.IsRoleNameTakenAsync(id, name));
+        }
         public IActionResult Add()
         {
             return View();

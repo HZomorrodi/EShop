@@ -83,6 +83,7 @@ namespace EShop.IocConfig
                 AddUserManager<UserManagerService>().
                 AddRoleManager<RoleManagerService>().
                 AddSignInManager<SignInManagerService>().
+                AddErrorDescriber<CustomIdentityErrorDescriber>().
                 AddDefaultTokenProviders().
                 AddTokenProvider<ConfirmEmailDataProtectorTokenProvider<User>>(EmailConfirmationTokenProviderName);
             services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.Zero);
@@ -103,7 +104,7 @@ namespace EShop.IocConfig
            {
                identityOptions.Password.RequireDigit = false;
                identityOptions.Password.RequireLowercase = false;
-               identityOptions.Password.RequireUppercase = false;
+               identityOptions.Password.RequireUppercase = true;
                identityOptions.Password.RequireNonAlphanumeric = false;
 
                identityOptions.Lockout.AllowedForNewUsers = false;
