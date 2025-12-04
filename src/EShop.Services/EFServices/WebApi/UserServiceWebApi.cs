@@ -1,4 +1,5 @@
-﻿using EShop.Services.Contracts;
+﻿using EShop.Common.Security;
+using EShop.Services.Contracts;
 using EShop.Services.Contracts.WebApi;
 using EShop.ViewModels.TestWebApi;
 using Newtonsoft.Json;
@@ -11,14 +12,19 @@ using System.Threading.Tasks;
 
 namespace EShop.Services.EFServices.WebApi
 {
-    public class UserServiceWebApi(IHttpClientService httpClientService, ICookieManager cookieManager) : IUserServiceWebApi
+    public class UserServiceWebApi(IHttpClientService httpClientService,
+                                   ICookieManager cookieManager,
+                                   IRijndaelEncryption rijndaelEncryption) : IUserServiceWebApi
     {
         private readonly IHttpClientService _httpClientService = httpClientService;
-        private readonly ICookieManager cookieManager = cookieManager;
+        private readonly ICookieManager _cookieManager = cookieManager;
+        private readonly IRijndaelEncryption _rijndaelEncryption = rijndaelEncryption;
 
         public async Task<OperationResult<List<ShowUserViewModel?>>> GetAllUserAsync()
         {
-            var result = await _httpClientService.SendAsync("https://localhost:7198/api/User", HttpMethod.Get, cookieManager.GetValue("JWTToken"));
+            string? encryptedToken = _cookieManager.GetValue("JWTToken");
+            string decryptedToken = _rijndaelEncryption.Decryption(encryptedToken);
+            var result = await _httpClientService.SendAsync("https://localhost:7198/api/User", HttpMethod.Get, decryptedToken);
 
             if (result.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -31,8 +37,10 @@ namespace EShop.Services.EFServices.WebApi
 
         public async Task<OperationResult<string>> AddAsync(AddUserViewModel input)
         {
+            string? encryptedToken = _cookieManager.GetValue("JWTToken");
+            string decryptedToken = _rijndaelEncryption.Decryption(encryptedToken);
             string modelInJson = JsonConvert.SerializeObject(input);
-            var result = await _httpClientService.SendAsync("https://localhost:7198/api/User/Base64", HttpMethod.Post, cookieManager.GetValue("JWTToken"), modelInJson);
+            var result = await _httpClientService.SendAsync("https://localhost:7198/api/User/Base64", HttpMethod.Post, decryptedToken, modelInJson);
 
             if (result.StatusCode != System.Net.HttpStatusCode.Created)
             {

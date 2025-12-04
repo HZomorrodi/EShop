@@ -1,8 +1,10 @@
 ﻿@using EShop.ViewModels.TestWebApi
 @model IEnumerable<ShowUserViewModel>
-
+@{
+    ViewData["Title"] = "لیست کاربران";
+}
 <p>
-    <a asp-action="Add">Create New</a>
+    <a asp-action="Add">افزودن</a>
 </p>
 <table class="table">
     <thead>

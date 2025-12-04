@@ -1,4 +1,5 @@
 ﻿using EShop.Common.Mvc;
+using EShop.Common.Security;
 using EShop.DataLayer.Context;
 using EShop.Entities.Identity;
 using EShop.Services;
@@ -68,6 +69,8 @@ namespace EShop.IocConfig
             services.AddScoped<IEmailSenderService, EmailSenderService>();
             services.AddScoped<ICookieManager, CookieManager>();
             services.AddScoped<IUserServiceWebApi, UserServiceWebApi>();
+            services.AddScoped<IRijndaelEncryption, RijndaelEncryption>();
+
             services.AddHttpClient<IHttpClientService, HttpClientService>(client =>
             {
                 // Configure the HttpClient

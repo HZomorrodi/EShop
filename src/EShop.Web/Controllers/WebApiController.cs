@@ -1,5 +1,6 @@
 ﻿using EShop.Common.Constants;
 using EShop.Common.Extensions;
+using EShop.Common.Security;
 using EShop.Services.Contracts;
 using EShop.Services.Contracts.WebApi;
 using EShop.ViewModels.TestWebApi;
@@ -14,10 +15,13 @@ using System.Threading.Tasks;
 namespace EShop.Web.Controllers
 {
     [TypeFilter(typeof(CustomAuthorize))]
-    public class WebApiController(ICookieManager cookieManager, IUserServiceWebApi userServiceWebApi) : Controller
+    public class WebApiController(ICookieManager cookieManager,
+                                  IUserServiceWebApi userServiceWebApi,
+                                  IRijndaelEncryption rijndaelEncryption) : Controller
     {
         private readonly ICookieManager _cookieManager = cookieManager;
         private readonly IUserServiceWebApi _userServiceWebApi = userServiceWebApi;
+        private readonly IRijndaelEncryption _rijndaelEncryption = rijndaelEncryption;
 
         public async Task<IActionResult> IndexAsync()
         {
@@ -81,7 +85,15 @@ namespace EShop.Web.Controllers
             }
             else
             {
-                _cookieManager.Add("JWTToken", result.Result.Trim('"'));
+                string encryptedToken = _rijndaelEncryption.Encryption(result.Result.Trim('"'));
+                _cookieManager.Add("JWTToken", encryptedToken, new CookieOptions()
+                {
+                    Expires = model.RememberMe ? DateTimeOffset.Now.AddDays(14) : null,
+                    Secure = true,
+                    HttpOnly = true,
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax
+                });
                 return Json(new
                 {
                     result = true
@@ -119,7 +131,7 @@ namespace EShop.Web.Controllers
             using (SqlCommand command = new(commandText2, connection))
             {
                 connection.Open();
-                command.Parameters.Add(new SqlParameter ("@UserName", model.UserName));
+                command.Parameters.Add(new SqlParameter("@UserName", model.UserName));
                 command.Parameters.Add(new SqlParameter("@Password", model.Password));
                 SqlDataReader results = command.ExecuteReader();
                 if (results.Read())
