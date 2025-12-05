@@ -32,6 +32,11 @@ namespace EShop.Web.Controllers
             }
             return View(result.Result);
         }
+        public IActionResult GetDataWithAjax()
+        {
+            return View();
+        }
+
         public IActionResult Add()
         {
             return View();

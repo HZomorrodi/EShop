@@ -13,6 +13,16 @@ builder.Services.Configure<ConnectionStringsModel>(builder.Configuration.GetSect
 
 builder.Services.AddControllers();
 builder.Services.AddCustomServicesWebApi();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CustomCORS", cors =>
+    {
+        cors.WithOrigins("https://localhost:7002")
+            .AllowAnyHeader()
+            .WithMethods(HttpMethods.Get, HttpMethods.Post)
+            .AllowCredentials();
+    });
+});
 
 // Add Swagger/OpenAPI support
 builder.Services.AddEndpointsApiExplorer();
@@ -35,7 +45,7 @@ builder.Services.AddSwaggerGen(options =>
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
-        Scheme = "bearer"   
+        Scheme = "bearer"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -85,6 +95,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
