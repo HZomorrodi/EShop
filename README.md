@@ -165,13 +165,12 @@ Database
 
 # 📷 Screenshots
 
-You can add screenshots of:
+<img width="1899" height="1019" alt="image" src="https://github.com/user-attachments/assets/94707acc-96ef-461a-b4fd-948cbe9fd802" />
 
-- Home Page
-- Product Page
-- Login
-- Admin Panel
-- Swagger (Web API)
+<img width="1918" height="868" alt="image" src="https://github.com/user-attachments/assets/48f35b09-38b7-4996-a7a2-058ecc7590d6" />
+
+ <img width="1901" height="869" alt="image" src="https://github.com/user-attachments/assets/d6cb9f82-e75c-492f-a9ca-61c87cb73fed" />
+
 
 ---
 
